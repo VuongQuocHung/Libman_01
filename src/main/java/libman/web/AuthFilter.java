@@ -40,10 +40,15 @@ public class AuthFilter implements Filter {
             return;
         }
 
-        String path = req.getRequestURI().substring(ctx.length());
-        boolean readerArea = path.startsWith("/view/reader/");
-        boolean librarianArea = path.startsWith("/view/librarian/");
-        if ((readerArea && !ROLE_READER.equals(role)) || (librarianArea && !ROLE_LIBRARIAN.equals(role))) {
+        // Phải dùng đường dẫn đã được container chuẩn hóa (bỏ "//", "/./", "/../", ";param").
+        // getRequestURI() là chuỗi thô: "/view//librarian/..." sẽ lọt qua phép so tiền tố.
+        String path = req.getServletPath() + (req.getPathInfo() == null ? "" : req.getPathInfo());
+
+        // Đóng mặc định: chỉ cho qua đúng cặp (khu vực, vai trò); mọi đường dẫn /view/* khác đều bị từ chối.
+        boolean allowed =
+                (path.startsWith("/view/reader/") && ROLE_READER.equals(role))
+                || (path.startsWith("/view/librarian/") && ROLE_LIBRARIAN.equals(role));
+        if (!allowed) {
             res.sendRedirect(ctx + "/index.jsp");
             return;
         }
