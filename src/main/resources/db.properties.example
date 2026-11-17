@@ -1,0 +1,12 @@
+# ============================================================
+#  Mẫu cấu hình MySQL cho LibMan
+#  Sao chép file này thành db.properties (cùng thư mục) rồi điền
+#  db.username / db.password. Đừng điền mật khẩu vào file .example
+#  này vì nó được đưa lên Git; db.properties thì đã bị .gitignore chặn.
+# ============================================================
+db.url=jdbc:mysql://localhost:3306/libman?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=UTF-8&connectionCollation=utf8mb4_0900_ai_ci&serverTimezone=Asia/Ho_Chi_Minh&allowPublicKeyRetrieval=true&useSSL=false
+db.username=root
+db.password=
+
+# true: lần chạy đầu, nếu chưa có bảng thì tự tạo schema (sql/schema.sql) và nạp dữ liệu mẫu (sql/data.sql)
+db.autoinit=true

@@ -1,0 +1,42 @@
+<%@ page import="libman.model.Member5, libman.util.Html, libman.util.Flash" %>
+<%
+    // Trang nhúng khai báo: String pageTitle (bắt buộc)
+    Member5 hdrMember = (Member5) session.getAttribute("member");
+    String hdrRole = (String) session.getAttribute("role");
+    String ctx = request.getContextPath();
+    String[] hdrFlash = Flash.take(session);
+    String hdrHome = ctx + "/index.jsp";
+    String hdrRoleLabel = "LIBRARIAN".equals(hdrRole) ? "Nhân viên thư viện" : "Độc giả";
+%>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= Html.esc(pageTitle) %> · LibMan</title>
+  <link rel="icon" href="data:,">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap&subset=vietnamese" rel="stylesheet">
+  <link rel="stylesheet" href="<%= ctx %>/assets/css/libman.css">
+</head>
+<body>
+<header class="topbar no-print">
+  <div class="topbar-inner">
+    <a class="brand" href="<%= hdrHome %>">
+      <span class="brand-name">LibMan</span>
+      <span class="brand-sub">Thư viện trường Đại học</span>
+    </a>
+    <% if (hdrMember != null) { %>
+    <div class="userchip">
+      <span class="avatar" aria-hidden="true"><%= Html.esc(hdrMember.getInitial()) %></span>
+      <span class="who"><%= Html.esc(hdrMember.getFullName()) %><small><%= hdrRoleLabel %></small></span>
+      <a class="logout" href="<%= ctx %>/doLogout.jsp" onclick="return confirm('Bạn muốn đăng xuất khỏi LibMan?');">Đăng xuất</a>
+    </div>
+    <% } %>
+  </div>
+</header>
+<main class="wrap">
+<% if (hdrFlash != null) { %>
+  <div class="alert alert-<%= Html.esc(hdrFlash[0]) %>" role="<%= "error".equals(hdrFlash[0]) ? "alert" : "status" %>"><%= Html.esc(hdrFlash[1]) %></div>
+<% } %>
