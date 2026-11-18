@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import libman.model.CopyStatistics5;
 import libman.model.Document5;
 import libman.model.DocumentCopy5;
 import libman.model.Status5;
@@ -12,12 +11,15 @@ import libman.util.DBUtil;
 
 public class DocumentCopyDAO5 {
 
+    /** Chỉ số trong mảng kết quả của getCopyStatistics(). */
+    public static final int TOTAL = 0;       // tổng số bản đang quản lí (không tính bản đã thanh lí)
+    public static final int AVAILABLE = 1;   // số bản có thể cho mượn
+
     /**
-     * Thống kê các bản của một đầu tài liệu:
-     * tổng số bản đang quản lí (không tính bản đã thanh lí) và số bản có thể cho mượn
-     * (trạng thái "Sẵn có" và không hư hỏng).
+     * Thống kê các bản của một đầu tài liệu, trả về mảng {tổng số bản, số bản có thể mượn}
+     * (đọc bằng các chỉ số TOTAL và AVAILABLE). Bản có thể mượn là bản "Sẵn có" và không hư hỏng.
      */
-    public CopyStatistics5 getCopyStatistics(int documentId) throws SQLException {
+    public int[] getCopyStatistics(int documentId) throws SQLException {
         String sql = "SELECT "
                 + "COUNT(CASE WHEN usageStatus <> ? THEN 1 END) AS total, "
                 + "COUNT(CASE WHEN usageStatus = ? AND copyCondition <> ? THEN 1 END) AS available "
@@ -28,8 +30,8 @@ public class DocumentCopyDAO5 {
             ps.setString(3, Status5.COND_DAMAGED);
             ps.setInt(4, documentId);
             try (ResultSet rs = ps.executeQuery()) {
-                rs.next();
-                return new CopyStatistics5(rs.getInt("total"), rs.getInt("available"));
+                rs.next();   // COUNT luôn trả về đúng một dòng
+                return new int[] { rs.getInt("total"), rs.getInt("available") };
             }
         }
     }

@@ -6,7 +6,7 @@
     String keyword = request.getParameter("keyword") == null ? "" : request.getParameter("keyword").trim();
 
     Document5 doc = null;
-    CopyStatistics5 stats = null;
+    int totalCount = 0, availableCount = 0;
     String message = null;
     try {
         if (!code.isEmpty()) doc = new DocumentDAO5().getDocumentByCode(code);
@@ -14,7 +14,9 @@
             message = "Tài liệu này không còn khả dụng để tra cứu.";
             doc = null;
         } else {
-            stats = new DocumentCopyDAO5().getCopyStatistics(doc.getId());
+            int[] stats = new DocumentCopyDAO5().getCopyStatistics(doc.getId());
+            totalCount = stats[DocumentCopyDAO5.TOTAL];
+            availableCount = stats[DocumentCopyDAO5.AVAILABLE];
         }
     } catch (SQLException e) {
         application.log("DocumentDetailView5: lỗi CSDL", e);
@@ -57,12 +59,12 @@
     <% } %>
 
     <div class="holdings">
-      <div class="count"><small>Tổng số bản đang có</small><b><%= stats.getTotalCount() %></b></div>
-      <div class="count"><small>Số bản có thể mượn</small><b><%= stats.getAvailableCount() %></b></div>
-      <% if (stats.getTotalCount() > 0) { %>
+      <div class="count"><small>Tổng số bản đang có</small><b><%= totalCount %></b></div>
+      <div class="count"><small>Số bản có thể mượn</small><b><%= availableCount %></b></div>
+      <% if (totalCount > 0) { %>
       <div>
-        <span class="meter" role="img" aria-label="<%= stats.getAvailableCount() %> trên <%= stats.getTotalCount() %> bản có thể mượn"><%
-          for (int k = 0; k < stats.getTotalCount(); k++) { %><i class="<%= k < stats.getAvailableCount() ? "" : "off" %>"></i><% } %></span>
+        <span class="meter" role="img" aria-label="<%= availableCount %> trên <%= totalCount %> bản có thể mượn"><%
+          for (int k = 0; k < totalCount; k++) { %><i class="<%= k < availableCount ? "" : "off" %>"></i><% } %></span>
         <small style="margin-top:4px">Ô màu xanh là bản có thể mượn ngay</small>
       </div>
       <% } else { %>

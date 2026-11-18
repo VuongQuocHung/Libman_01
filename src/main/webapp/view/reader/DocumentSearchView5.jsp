@@ -11,7 +11,7 @@
     String message = null;           // lỗi nhập liệu hoặc không có kết quả
     String messageType = "info";
     List<Document5> docs = new ArrayList<>();
-    Map<Integer, CopyStatistics5> stats = new HashMap<>();
+    Map<Integer, int[]> stats = new HashMap<>();   // {tổng số bản, số bản có thể mượn} theo id tài liệu
 
     if (submitted) {
         if (keyword.isEmpty()) {
@@ -67,7 +67,8 @@
         int i = 0;
         for (Document5 d : docs) {
             i++;
-            CopyStatistics5 st = stats.get(d.getId());
+            int totalCount = stats.get(d.getId())[DocumentCopyDAO5.TOTAL];
+            int availableCount = stats.get(d.getId())[DocumentCopyDAO5.AVAILABLE];
             String href = ctx + "/view/reader/DocumentDetailView5.jsp?code=" + Html.url(d.getDocumentCode())
                     + "&keyword=" + Html.url(keyword);
       %>
@@ -80,8 +81,8 @@
           <td>
             <span class="avail">
               <span class="meter" aria-hidden="true"><%
-                for (int k = 0; k < st.getTotalCount(); k++) { %><i class="<%= k < st.getAvailableCount() ? "" : "off" %>"></i><% } %></span>
-              <span><b><%= st.getAvailableCount() %></b> / <%= st.getTotalCount() %> bản</span>
+                for (int k = 0; k < totalCount; k++) { %><i class="<%= k < availableCount ? "" : "off" %>"></i><% } %></span>
+              <span><b><%= availableCount %></b> / <%= totalCount %> bản</span>
             </span>
           </td>
         </tr>
