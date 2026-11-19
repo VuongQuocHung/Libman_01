@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="java.sql.SQLException, libman.dao.*, libman.model.*, libman.util.Html" %>
+<%@ page import="java.net.URLEncoder, java.nio.charset.StandardCharsets, java.sql.SQLException, libman.dao.*, libman.model.*" %>
+<%@ include file="/WEB-INF/jspf/checkReader.jspf" %>
 <%
     String pageTitle = "Chi tiết tài liệu";
 
@@ -19,18 +20,20 @@
     String message = null;
 
     // lấy tài liệu và thống kê bản
-    try {
+    try (DocumentDAO5 documentDao = new DocumentDAO5();
+         DocumentCopyDAO5 copyDao = new DocumentCopyDAO5()) {
         if (!code.isEmpty()) {
-            document = new DocumentDAO5().getDocumentByCode(code);
+            document = documentDao.getDocumentByCode(code);
         }
 
-        if (document == null || !document.isInUse()) {
+        if (document == null || !"Đang sử dụng".equals(document.getDocumentStatus())) {
             message = "Tài liệu này không còn khả dụng để tra cứu.";
             document = null;
         } else {
-            int[] copyCounts = new DocumentCopyDAO5().getCopyStatistics(document.getId());
-            totalCount = copyCounts[DocumentCopyDAO5.TOTAL];
-            availableCount = copyCounts[DocumentCopyDAO5.AVAILABLE];
+            // copyCounts = {tổng số bản, số bản có thể mượn}
+            int[] copyCounts = copyDao.getCopyStatistics(document.getId());
+            totalCount = copyCounts[0];
+            availableCount = copyCounts[1];
         }
     } catch (SQLException e) {
         application.log("DocumentDetailView5: lỗi CSDL", e);
@@ -42,7 +45,7 @@
     String searchUrl = request.getContextPath() + "/view/reader/DocumentSearchView5.jsp";
     String backUrl = searchUrl;
     if (!keyword.isEmpty()) {
-        backUrl = searchUrl + "?keyword=" + Html.url(keyword);
+        backUrl = searchUrl + "?keyword=" + URLEncoder.encode(keyword, StandardCharsets.UTF_8);
     }
 
     // chuẩn bị dữ liệu hiển thị
@@ -52,7 +55,7 @@
     String yearPart = "";
     if (document != null) {
         if (document.getPublisher() != null) {
-            publisherPart = " — " + Html.esc(document.getPublisher());
+            publisherPart = " — " + esc(document.getPublisher());
         }
         if (document.getYear() != null) {
             yearText = String.valueOf(document.getYear());
@@ -69,23 +72,23 @@
 </div>
 
 <% if (document == null) { %>
-  <div class="alert alert-error" role="alert"><%= Html.esc(message) %></div>
+  <div class="alert alert-error" role="alert"><%= esc(message) %></div>
 <% } else { %>
   <article class="catcard">
-    <span class="callno"><%= Html.esc(document.getDocumentCode()) %></span>
-    <h1><%= Html.esc(document.getTitle()) %></h1>
+    <span class="callno"><%= esc(document.getDocumentCode()) %></span>
+    <h1><%= esc(document.getTitle()) %></h1>
     <p class="byline">
-      <b><%= Html.esc(document.getAuthor()) %></b><%= publisherPart %><%= yearPart %>
+      <b><%= esc(document.getAuthor()) %></b><%= publisherPart %><%= yearPart %>
     </p>
 
     <dl class="facts">
-      <div><dt>Mã tài liệu</dt><dd><%= Html.esc(document.getDocumentCode()) %></dd></div>
-      <div><dt>Loại tài liệu</dt><dd><%= Html.esc(document.getDocumentType()) %></dd></div>
-      <div><dt>Tác giả</dt><dd><%= Html.esc(document.getAuthor()) %></dd></div>
+      <div><dt>Mã tài liệu</dt><dd><%= esc(document.getDocumentCode()) %></dd></div>
+      <div><dt>Loại tài liệu</dt><dd><%= esc(document.getDocumentType()) %></dd></div>
+      <div><dt>Tác giả</dt><dd><%= esc(document.getAuthor()) %></dd></div>
       <div><dt>Năm xuất bản</dt><dd><%= yearText %></dd></div>
-      <div><dt>Nhà xuất bản</dt><dd><%= Html.esc(document.getPublisher()) %></dd></div>
+      <div><dt>Nhà xuất bản</dt><dd><%= esc(document.getPublisher()) %></dd></div>
       <% if (document.getLanguage() != null) { %>
-        <div><dt>Ngôn ngữ</dt><dd><%= Html.esc(document.getLanguage()) %></dd></div>
+        <div><dt>Ngôn ngữ</dt><dd><%= esc(document.getLanguage()) %></dd></div>
       <% } %>
       <% if (document.getPageCount() != null) { %>
         <div><dt>Số trang</dt><dd><%= document.getPageCount() %></dd></div>
@@ -93,7 +96,7 @@
     </dl>
 
     <% if (document.getDescription() != null && !document.getDescription().isBlank()) { %>
-      <p class="desc"><%= Html.esc(document.getDescription()) %></p>
+      <p class="desc"><%= esc(document.getDescription()) %></p>
     <% } %>
 
     <div class="holdings">

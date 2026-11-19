@@ -1,12 +1,13 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="libman.model.*, libman.util.Html, libman.util.LendingSession" %>
+<%@ page import="libman.model.*" %>
+<%@ include file="/WEB-INF/jspf/checkLibrarian.jspf" %>
 <%
     String pageTitle = "Trang chủ nhân viên thư viện";
     Librarian5 librarian = (Librarian5) session.getAttribute("member");
 
     // Nếu có một lượt cho mượn đang dở thì hiện đường dẫn để nhân viên làm tiếp
-    Reader5 lendingReader = (Reader5) session.getAttribute(LendingSession.READER);
-    boolean hasSavedSlip = LendingSession.savedSlip(session) != null;
+    Reader5 lendingReader = (Reader5) session.getAttribute("lendReader");
+    boolean hasSavedSlip = session.getAttribute("lendSavedSlip") != null;
 
     String continuePage;
     if (hasSavedSlip) {
@@ -17,13 +18,13 @@
 %>
 <%@ include file="/WEB-INF/jspf/header.jspf" %>
 <div class="page-head">
-  <h1>Xin chào, <%= Html.esc(librarian.getFullName()) %></h1>
+  <h1>Xin chào, <%= esc(librarian.getFullName()) %></h1>
   <p class="lede">Làm thủ tục cho độc giả mượn tài liệu tại quầy.</p>
 </div>
 
 <% if (lendingReader != null) { %>
   <div class="alert alert-warn">
-    Đang có một lượt cho mượn chưa xong, độc giả <b><%= Html.esc(lendingReader.getFullName()) %></b>.
+    Đang có một lượt cho mượn chưa xong, độc giả <b><%= esc(lendingReader.getFullName()) %></b>.
     <a href="<%= ctx %>/view/librarian/<%= continuePage %>">Tiếp tục</a>
   </div>
 <% } %>
@@ -44,8 +45,8 @@
 </div>
 
 <div class="infostrip">
-  <div><small>Mã nhân viên</small><b><%= Html.esc(librarian.getStaffCode()) %></b></div>
-  <div><small>Vị trí</small><b><%= Html.esc(librarian.getPosition()) %></b></div>
-  <div><small>Ca làm việc</small><b><%= Html.esc(librarian.getSchedule()) %></b></div>
+  <div><small>Mã nhân viên</small><b><%= esc(librarian.getStaffCode()) %></b></div>
+  <div><small>Vị trí</small><b><%= esc(librarian.getPosition()) %></b></div>
+  <div><small>Ca làm việc</small><b><%= esc(librarian.getSchedule()) %></b></div>
 </div>
 <%@ include file="/WEB-INF/jspf/footer.jspf" %>

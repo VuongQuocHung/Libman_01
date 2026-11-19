@@ -1,0 +1,9 @@
+<%
+    // Chỉ độc giả đã đăng nhập mới được vào các trang trong view/reader
+    if (!"READER".equals(session.getAttribute("role"))) {
+        response.sendRedirect(request.getContextPath() + "/index.jsp");
+        return;
+    }
+    // Không cho trình duyệt lưu lại trang (bấm Back sau khi đăng xuất không còn thấy trang)
+    response.setHeader("Cache-Control", "no-store");
+%>

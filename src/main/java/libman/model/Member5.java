@@ -86,15 +86,4 @@ public class Member5 {
     public void setActive(boolean active) {
         this.active = active;
     }
-
-    /** Chữ cái đầu của tên gọi (từ cuối trong họ tên) để vẽ avatar. */
-    public String getInitial() {
-        if (fullName == null || fullName.isBlank()) {
-            return "?";
-        }
-
-        String[] words = fullName.trim().split("\\s+");
-        String lastWord = words[words.length - 1];
-        return lastWord.substring(0, 1).toUpperCase();
-    }
 }

@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="java.sql.SQLException, java.util.*, libman.dao.*, libman.model.*, libman.util.Html" %>
+<%@ page import="java.net.URLEncoder, java.nio.charset.StandardCharsets, java.sql.SQLException, java.util.*, libman.dao.*, libman.model.*" %>
+<%@ include file="/WEB-INF/jspf/checkReader.jspf" %>
 <%
     String pageTitle = "Tìm tài liệu";
 
@@ -17,20 +18,8 @@
 
     List<Document5> documents = new ArrayList<>();
 
-    // {tổng số bản, số bản có thể mượn} theo id tài liệu
-    Map<Integer, int[]> statistics = new HashMap<>();
-
-    // Phân trang: ?page=2 (đếm từ 1); giá trị lạ thì coi như trang 1
-    int pageSize = DocumentDAO5.PAGE_SIZE;
-    int totalDocuments = 0;
-    int totalPages = 1;
-    int currentPage = 1;
-    try {
-        int requestedPage = Integer.parseInt(request.getParameter("page").trim());
-        currentPage = Math.max(1, requestedPage);
-    } catch (RuntimeException e) {
-        // Không có tham số page hoặc không phải số: giữ trang 1
-    }
+    // statistics.get(i) là {tổng số bản, số bản có thể mượn} của documents.get(i)
+    List<int[]> statistics = new ArrayList<>();
 
     // tìm kiếm
     if (submitted) {
@@ -38,30 +27,23 @@
             message = "Hãy nhập tên tài liệu cần tìm.";
             messageType = "error";
         } else {
-            try {
-                DocumentDAO5 documentDao = new DocumentDAO5();
-                totalDocuments = documentDao.countDocumentByTitle(keyword);
-                totalPages = Math.max(1, (totalDocuments + pageSize - 1) / pageSize);
+            try (DocumentDAO5 documentDao = new DocumentDAO5();
+                 DocumentCopyDAO5 copyDao = new DocumentCopyDAO5()) {
+                documents = documentDao.getDocumentByTitle(keyword);
 
-                // Trang vượt quá thì lùi về trang cuối
-                currentPage = Math.min(currentPage, totalPages);
+                // Với mỗi tài liệu tìm được, thống kê các bản của tài liệu đó
+                for (Document5 document : documents) {
+                    statistics.add(copyDao.getCopyStatistics(document.getId()));
+                }
 
-                if (totalDocuments > 0) {
-                    documents = documentDao.getDocumentByTitle(keyword, currentPage, pageSize);
-
-                    // Một truy vấn đếm bản cho cả trang, không gọi riêng từng tài liệu
-                    List<Integer> documentIds = new ArrayList<>();
-                    for (Document5 document : documents) {
-                        documentIds.add(document.getId());
-                    }
-                    statistics = new DocumentCopyDAO5().getCopyStatistics(documentIds);
-                } else {
+                if (documents.isEmpty()) {
                     message = "Không tìm thấy tài liệu phù hợp. Thử từ khóa ngắn hơn hoặc viết khác đi.";
                 }
             } catch (SQLException e) {
                 application.log("DocumentSearchView5: lỗi CSDL", e);
                 message = "Hệ thống chưa tra cứu được lúc này. Hãy thử lại sau ít phút.";
                 messageType = "error";
+                documents = new ArrayList<>();
             }
         }
     }
@@ -70,16 +52,6 @@
     String messageRole = "status";
     if ("error".equals(messageType)) {
         messageRole = "alert";
-    }
-
-    // Dòng tóm tắt bên cạnh tiêu đề kết quả: "3 tài liệu" hoặc "Hiển thị 11–20 trong 47 tài liệu"
-    int firstResult = (currentPage - 1) * pageSize + 1;
-    int lastResult = firstResult + documents.size() - 1;
-    String resultSummary;
-    if (totalDocuments <= pageSize) {
-        resultSummary = totalDocuments + " tài liệu";
-    } else {
-        resultSummary = "Hiển thị " + firstResult + "–" + lastResult + " trong " + totalDocuments + " tài liệu";
     }
 %>
 <%@ include file="/WEB-INF/jspf/header.jspf" %>
@@ -93,7 +65,7 @@
 <form class="panel" method="get" action="<%= ctx %>/view/reader/DocumentSearchView5.jsp" role="search">
   <label class="lbl" for="keyword">Tên tài liệu</label>
   <div class="searchbar">
-    <input class="input" id="keyword" name="keyword" type="search" value="<%= Html.esc(keyword) %>"
+    <input class="input" id="keyword" name="keyword" type="search" value="<%= esc(keyword) %>"
            placeholder="Ví dụ: Cơ sở dữ liệu" autofocus>
     <button class="btn btn-primary" type="submit">Tìm kiếm</button>
   </div>
@@ -102,15 +74,15 @@
 
 <% if (message != null) { %>
   <div class="alert alert-<%= messageType %>" style="margin-top:18px" role="<%= messageRole %>">
-    <%= Html.esc(message) %>
+    <%= esc(message) %>
   </div>
 <% } %>
 
 <% if (!documents.isEmpty()) { %>
 <div class="panel" style="margin-top:18px">
   <div class="panel-head">
-    <h2>Kết quả cho “<%= Html.esc(keyword) %>”</h2>
-    <span class="muted"><%= resultSummary %></span>
+    <h2>Kết quả cho “<%= esc(keyword) %>”</h2>
+    <span class="muted"><%= documents.size() %> tài liệu</span>
   </div>
   <div class="table-wrap">
     <table class="grid">
@@ -126,15 +98,13 @@
       </thead>
       <tbody>
       <%
-          // Số thứ tự tiếp nối giữa các trang
-          int rowNumber = (currentPage - 1) * pageSize;
+          for (int i = 0; i < documents.size(); i++) {
+              Document5 document = documents.get(i);
 
-          for (Document5 document : documents) {
-              rowNumber++;
-
-              int[] copyCounts = statistics.get(document.getId());
-              int totalCount = copyCounts[DocumentCopyDAO5.TOTAL];
-              int availableCount = copyCounts[DocumentCopyDAO5.AVAILABLE];
+              // copyCounts = {tổng số bản, số bản có thể mượn}
+              int[] copyCounts = statistics.get(i);
+              int totalCount = copyCounts[0];
+              int availableCount = copyCounts[1];
 
               String yearText = "";
               if (document.getYear() != null) {
@@ -142,14 +112,14 @@
               }
 
               String detailUrl = ctx + "/view/reader/DocumentDetailView5.jsp"
-                      + "?code=" + Html.url(document.getDocumentCode())
-                      + "&keyword=" + Html.url(keyword);
+                      + "?code=" + URLEncoder.encode(document.getDocumentCode(), StandardCharsets.UTF_8)
+                      + "&keyword=" + URLEncoder.encode(keyword, StandardCharsets.UTF_8);
       %>
         <tr>
-          <td><%= rowNumber %></td>
-          <td class="code"><%= Html.esc(document.getDocumentCode()) %></td>
-          <td><a class="title" href="<%= detailUrl %>"><%= Html.esc(document.getTitle()) %></a></td>
-          <td><%= Html.esc(document.getDocumentType()) %></td>
+          <td><%= i + 1 %></td>
+          <td class="code"><%= esc(document.getDocumentCode()) %></td>
+          <td><a class="title" href="<%= detailUrl %>"><%= esc(document.getTitle()) %></a></td>
+          <td><%= esc(document.getDocumentType()) %></td>
           <td class="num"><%= yearText %></td>
           <td>
             <span class="avail">
@@ -173,27 +143,6 @@
       </tbody>
     </table>
   </div>
-
-  <% if (totalPages > 1) {
-         String pageUrlBase = ctx + "/view/reader/DocumentSearchView5.jsp"
-                 + "?keyword=" + Html.url(keyword) + "&page=";
-  %>
-  <nav class="pager" aria-label="Chuyển trang kết quả">
-    <% if (currentPage > 1) { %>
-      <a class="btn btn-small" href="<%= pageUrlBase + (currentPage - 1) %>">Trang trước</a>
-    <% } else { %>
-      <span class="btn btn-small is-disabled" aria-disabled="true">Trang trước</span>
-    <% } %>
-
-    <span class="muted">Trang <b><%= currentPage %></b> / <%= totalPages %></span>
-
-    <% if (currentPage < totalPages) { %>
-      <a class="btn btn-small" href="<%= pageUrlBase + (currentPage + 1) %>">Trang sau</a>
-    <% } else { %>
-      <span class="btn btn-small is-disabled" aria-disabled="true">Trang sau</span>
-    <% } %>
-  </nav>
-  <% } %>
 </div>
 <% } %>
 

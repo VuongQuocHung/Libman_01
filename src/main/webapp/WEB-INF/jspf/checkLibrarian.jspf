@@ -1,0 +1,9 @@
+<%
+    // Chỉ nhân viên thư viện đã đăng nhập mới được vào các trang trong view/librarian
+    if (!"LIBRARIAN".equals(session.getAttribute("role"))) {
+        response.sendRedirect(request.getContextPath() + "/index.jsp");
+        return;
+    }
+    // Không cho trình duyệt lưu lại trang (bấm Back sau khi đăng xuất không còn thấy trang)
+    response.setHeader("Cache-Control", "no-store");
+%>

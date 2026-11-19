@@ -7,10 +7,3 @@
 db.url=jdbc:mysql://localhost:3306/libman?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=UTF-8&connectionCollation=utf8mb4_0900_ai_ci&serverTimezone=Asia/Ho_Chi_Minh&allowPublicKeyRetrieval=true&useSSL=false
 db.username=root
 db.password=
-
-# Connection pool (tùy chọn, không cần khai báo thì dùng giá trị mặc định ghi bên dưới)
-#db.pool.size=10
-#db.pool.timeout.ms=5000
-
-# true: lần chạy đầu, nếu chưa có bảng thì tự tạo schema (sql/schema.sql) và nạp dữ liệu mẫu (sql/data.sql)
-db.autoinit=true

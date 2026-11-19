@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="java.sql.Date, java.util.List, libman.model.*, libman.util.*" %>
+<%@ page import="java.sql.Date, java.time.LocalDate, java.util.*, libman.model.*" %>
+<%@ include file="/WEB-INF/jspf/checkLibrarian.jspf" %>
 <%
     String pageTitle = "Quản lí mượn tài liệu";
     String base = request.getContextPath();
@@ -8,15 +9,21 @@
     String slipUrl = base + "/view/librarian/BorrowingSlipView5.jsp";
 
     // Phiếu đã lưu thì không sửa danh sách nữa: chuyển sang màn phiếu mượn
-    if (LendingSession.savedSlip(session) != null) {
+    if (session.getAttribute("lendSavedSlip") != null) {
         response.sendRedirect(slipUrl);
         return;
     }
 
-    Reader5 lendReader = (Reader5) session.getAttribute(LendingSession.READER);
-    ReaderCard5 lendCard = (ReaderCard5) session.getAttribute(LendingSession.CARD);
-    List<BorrowingDetail5> items = LendingSession.items(session);
-    Date today = Html.today();
+    // Dữ liệu tạm của lượt cho mượn, giữ trong session:
+    // lendReader (độc giả), lendCard (thẻ), lendItems (danh sách bản dự kiến mượn), lendDueDate (hạn trả)
+    Reader5 lendReader = (Reader5) session.getAttribute("lendReader");
+    ReaderCard5 lendCard = (ReaderCard5) session.getAttribute("lendCard");
+    List<BorrowingDetail5> items = (List<BorrowingDetail5>) session.getAttribute("lendItems");
+    if (items == null) {
+        items = new ArrayList<>();
+        session.setAttribute("lendItems", items);
+    }
+    Date today = Date.valueOf(LocalDate.now());
 
     // xử lí các nút bấm (POST)
     if ("POST".equalsIgnoreCase(request.getMethod())) {
@@ -26,12 +33,15 @@
             // Bỏ một bản khỏi danh sách tạm
             String copyCode = request.getParameter("copyCode");
             items.removeIf(detail -> detail.getDocumentCopy().getCopyCode().equals(copyCode));
-            Flash.info(session, "Đã bỏ bản " + copyCode + " khỏi danh sách.");
+            session.setAttribute("infoMessage", "Đã bỏ bản " + copyCode + " khỏi danh sách.");
 
         } else if ("cancel".equals(action)) {
             // Hủy cả lượt cho mượn: xóa dữ liệu tạm rồi về trang chủ
-            LendingSession.clear(session);
-            Flash.info(session, "Đã hủy lượt cho mượn. Chưa có gì được ghi nhận.");
+            session.removeAttribute("lendReader");
+            session.removeAttribute("lendCard");
+            session.removeAttribute("lendItems");
+            session.removeAttribute("lendDueDate");
+            session.setAttribute("infoMessage", "Đã hủy lượt cho mượn. Chưa có gì được ghi nhận.");
             response.sendRedirect(homeUrl);
             return;
 
@@ -47,18 +57,18 @@
                 // Nhập sai định dạng ngày thì coi như chưa nhập
             }
             if (submittedDueDate != null) {
-                session.setAttribute(LendingSession.DUE, submittedDueDate);
+                session.setAttribute("lendDueDate", submittedDueDate);
             }
 
             // Kiểm tra đủ điều kiện sang bước xem phiếu
             if (lendReader == null) {
-                Flash.error(session, "Hãy xác định độc giả trước khi tiếp tục.");
+                session.setAttribute("errorMessage", "Hãy xác định độc giả trước khi tiếp tục.");
             } else if (items.isEmpty()) {
-                Flash.error(session, "Danh sách mượn đang trống. Hãy thêm ít nhất một bản tài liệu.");
+                session.setAttribute("errorMessage", "Danh sách mượn đang trống. Hãy thêm ít nhất một bản tài liệu.");
             } else if (submittedDueDate == null) {
-                Flash.error(session, "Nhập hạn trả theo dạng ngày/tháng/năm hợp lệ.");
+                session.setAttribute("errorMessage", "Nhập hạn trả theo dạng ngày/tháng/năm hợp lệ.");
             } else if (!submittedDueDate.after(today)) {
-                Flash.error(session, "Hạn trả phải sau ngày mượn (" + Html.date(today) + ").");
+                session.setAttribute("errorMessage", "Hạn trả phải sau ngày mượn (" + date(today) + ").");
             } else {
                 response.sendRedirect(slipUrl);
                 return;
@@ -70,9 +80,10 @@
     }
 
     // chuẩn bị dữ liệu hiển thị
-    Date dueDate = (Date) session.getAttribute(LendingSession.DUE);
+    // Hạn trả gợi ý mặc định 30 ngày kể từ hôm nay (nhân viên sửa được)
+    Date dueDate = (Date) session.getAttribute("lendDueDate");
     if (dueDate == null) {
-        dueDate = Date.valueOf(today.toLocalDate().plusDays(LendingSession.DEFAULT_LOAN_DAYS));
+        dueDate = Date.valueOf(today.toLocalDate().plusDays(30));
     }
     Date earliestDueDate = Date.valueOf(today.toLocalDate().plusDays(1));
 
@@ -133,11 +144,11 @@
       </a>
     <% } else { %>
       <dl class="kv">
-        <dt>Mã độc giả</dt><dd><%= Html.esc(lendReader.getReaderCode()) %></dd>
-        <dt>Họ và tên</dt><dd><%= Html.esc(lendReader.getFullName()) %></dd>
+        <dt>Mã độc giả</dt><dd><%= esc(lendReader.getReaderCode()) %></dd>
+        <dt>Họ và tên</dt><dd><%= esc(lendReader.getFullName()) %></dd>
         <% if (lendCard != null) { %>
-          <dt>Mã thẻ</dt><dd><%= Html.esc(lendCard.getCardCode()) %></dd>
-          <dt>Hết hạn thẻ</dt><dd><%= Html.date(lendCard.getExpiryDate()) %></dd>
+          <dt>Mã thẻ</dt><dd><%= esc(lendCard.getCardCode()) %></dd>
+          <dt>Hết hạn thẻ</dt><dd><%= date(lendCard.getExpiryDate()) %></dd>
         <% } %>
       </dl>
       <div class="actions" style="margin-top:16px">
@@ -186,7 +197,7 @@
                   DocumentCopy5 copy = detail.getDocumentCopy();
 
                   String conditionBadge;
-                  if (Status5.COND_GOOD.equals(detail.getConditionOnBorrowing())) {
+                  if ("Tốt".equals(detail.getConditionOnBorrowing())) {
                       conditionBadge = "badge-ok";
                   } else {
                       conditionBadge = "badge-warn";
@@ -194,18 +205,18 @@
           %>
             <tr>
               <td><%= rowNumber %></td>
-              <td class="code"><%= Html.esc(copy.getCopyCode()) %></td>
-              <td><%= Html.esc(copy.getDocument().getDocumentCode()) %></td>
-              <td><%= Html.esc(copy.getDocument().getTitle()) %></td>
+              <td class="code"><%= esc(copy.getCopyCode()) %></td>
+              <td><%= esc(copy.getDocument().getDocumentCode()) %></td>
+              <td><%= esc(copy.getDocument().getTitle()) %></td>
               <td>
                 <span class="badge <%= conditionBadge %>">
-                  <%= Html.esc(detail.getConditionOnBorrowing()) %>
+                  <%= esc(detail.getConditionOnBorrowing()) %>
                 </span>
               </td>
               <td>
                 <form method="post" action="<%= selfUrl %>">
                   <input type="hidden" name="action" value="remove">
-                  <input type="hidden" name="copyCode" value="<%= Html.esc(copy.getCopyCode()) %>">
+                  <input type="hidden" name="copyCode" value="<%= esc(copy.getCopyCode()) %>">
                   <button class="btn btn-small btn-danger" type="submit">Bỏ chọn</button>
                 </form>
               </td>
@@ -220,15 +231,15 @@
       <input type="hidden" name="action" value="continue">
       <div class="field">
         <label class="lbl" for="borrowDate">Ngày mượn</label>
-        <input class="input" id="borrowDate" type="text" value="<%= Html.date(today) %>" readonly>
+        <input class="input" id="borrowDate" type="text" value="<%= date(today) %>" readonly>
       </div>
       <div class="field">
         <label class="lbl" for="dueDate">Hạn trả chung</label>
         <input class="input" id="dueDate" name="dueDate" type="date"
-               value="<%= Html.iso(dueDate) %>" min="<%= Html.iso(earliestDueDate) %>" required>
+               value="<%= dueDate %>" min="<%= earliestDueDate %>" required>
       </div>
       <div class="hint" style="flex-basis:100%;margin:0">
-        Mặc định <%= LendingSession.DEFAULT_LOAN_DAYS %> ngày kể từ hôm nay.
+        Mặc định 30 ngày kể từ hôm nay.
         Mọi bản trong phiếu dùng chung một hạn trả.
       </div>
     </form>

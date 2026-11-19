@@ -1,5 +1,8 @@
 -- LibMan - dữ liệu mẫu (lấy theo kịch bản trong báo cáo). Mật khẩu mọi tài khoản: 123456
 -- (lưu dạng SHA-256: 8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92)
+-- Chạy sau schema.sql: mysql -u root -p < data.sql
+
+USE libman;
 
 INSERT INTO tblMember5 (id, username, password, fullName, birthDate, email, phone, address, is_active) VALUES
  (1, 'quanly', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'Nguyễn Thị Lan', '1985-05-20', 'lan.nt@libman.edu.vn', '0911111111', 'Hà Nội', TRUE),

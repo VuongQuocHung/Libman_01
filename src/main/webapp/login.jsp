@@ -1,5 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="libman.util.Html" %>
+<%@ include file="/WEB-INF/jspf/helpers.jspf" %>
 <%
     String ctx = request.getContextPath();
     if (session.getAttribute("member") != null) {
@@ -45,14 +45,14 @@
       <h1>Đăng nhập</h1>
       <p class="muted">Dùng tài khoản do thư viện cấp.</p>
       <% if (error != null) { %>
-        <div class="alert alert-error" role="alert" style="margin-top:14px"><%= Html.esc(error) %></div>
+        <div class="alert alert-error" role="alert" style="margin-top:14px"><%= esc(error) %></div>
       <% } else if (loggedOut) { %>
         <div class="alert alert-info" role="status" style="margin-top:14px">Bạn đã đăng xuất.</div>
       <% } %>
       <div class="field">
         <label class="lbl" for="username">Tên tài khoản</label>
         <input class="input" id="username" name="username" type="text" required autofocus autocomplete="username"
-               value="<%= Html.esc(lastUser) %>">
+               value="<%= esc(lastUser) %>">
       </div>
       <div class="field">
         <label class="lbl" for="password">Mật khẩu</label>

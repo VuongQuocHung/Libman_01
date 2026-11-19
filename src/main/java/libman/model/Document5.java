@@ -101,8 +101,4 @@ public class Document5 {
     public void setDocumentStatus(String documentStatus) {
         this.documentStatus = documentStatus;
     }
-
-    public boolean isInUse() {
-        return Status5.DOC_ACTIVE.equals(documentStatus);
-    }
 }

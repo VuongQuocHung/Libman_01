@@ -1,27 +1,37 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="java.sql.Date, java.util.List, libman.model.*, libman.util.*" %>
+<%@ page import="java.sql.Date, java.time.LocalDate, java.util.*, libman.model.*" %>
+<%@ include file="/WEB-INF/jspf/checkLibrarian.jspf" %>
 <%
     String base = request.getContextPath();
     String selfUrl = base + "/view/librarian/BorrowingSlipView5.jsp";
     String lendingUrl = base + "/view/librarian/DocumentLendingView5.jsp";
     String homeUrl = base + "/view/librarian/LibrarianHomeView5.jsp";
     String saveUrl = base + "/view/librarian/doSaveBorrowingSlip5.jsp";
-    BorrowingSlip5 savedSlip = LendingSession.savedSlip(session);
+
+    // Phiếu đã lưu (do doSaveBorrowingSlip5.jsp để lại trong session); null nếu chưa lưu
+    BorrowingSlip5 savedSlip = (BorrowingSlip5) session.getAttribute("lendSavedSlip");
 
     // xử lí các nút bấm (POST)
     if ("POST".equalsIgnoreCase(request.getMethod())) {
         String action = request.getParameter("action");
 
-        if ("cancel".equals(action) && savedSlip == null) {
-            // Hủy khi chưa lưu: bỏ dữ liệu tạm, chưa có gì trong CSDL
-            LendingSession.clear(session);
-            Flash.info(session, "Đã hủy lượt cho mượn. Chưa có gì được ghi nhận.");
-            response.sendRedirect(homeUrl);
+        boolean cancel = "cancel".equals(action) && savedSlip == null;
+        boolean finish = "finish".equals(action) && savedSlip != null;
 
-        } else if ("finish".equals(action) && savedSlip != null) {
-            // Hoàn tất sau khi đã lưu: xóa dữ liệu tạm rồi về trang chủ
-            LendingSession.clear(session);
-            Flash.success(session, "Đã hoàn tất cho mượn.");
+        if (cancel || finish) {
+            // Hủy (khi chưa lưu) hoặc Hoàn tất (khi đã lưu): xóa dữ liệu tạm của lượt cho mượn
+            session.removeAttribute("lendReader");
+            session.removeAttribute("lendCard");
+            session.removeAttribute("lendItems");
+            session.removeAttribute("lendDueDate");
+            session.removeAttribute("lendSavedSlip");
+            session.removeAttribute("lendJustSaved");
+
+            if (cancel) {
+                session.setAttribute("infoMessage", "Đã hủy lượt cho mượn. Chưa có gì được ghi nhận.");
+            } else {
+                session.setAttribute("successMessage", "Đã hoàn tất cho mượn.");
+            }
             response.sendRedirect(homeUrl);
 
         } else {
@@ -40,17 +50,17 @@
         slip = savedSlip;
 
         // Chỉ gửi lệnh in tự động đúng một lần ngay sau khi lưu
-        printNow = Boolean.TRUE.equals(session.getAttribute(LendingSession.JUST_SAVED));
-        session.removeAttribute(LendingSession.JUST_SAVED);
+        printNow = session.getAttribute("lendJustSaved") != null;
+        session.removeAttribute("lendJustSaved");
 
     } else {
         // Chưa lưu: dựng phiếu tạm từ dữ liệu trong session để nhân viên kiểm tra
-        Reader5 reader = (Reader5) session.getAttribute(LendingSession.READER);
-        List<BorrowingDetail5> items = LendingSession.items(session);
-        Date dueDate = (Date) session.getAttribute(LendingSession.DUE);
+        Reader5 reader = (Reader5) session.getAttribute("lendReader");
+        List<BorrowingDetail5> items = (List<BorrowingDetail5>) session.getAttribute("lendItems");
+        Date dueDate = (Date) session.getAttribute("lendDueDate");
 
-        if (reader == null || items.isEmpty() || dueDate == null) {
-            Flash.error(session, "Chưa đủ thông tin để lập phiếu. "
+        if (reader == null || items == null || items.isEmpty() || dueDate == null) {
+            session.setAttribute("errorMessage", "Chưa đủ thông tin để lập phiếu. "
                     + "Kiểm tra độc giả, danh sách tài liệu và hạn trả.");
             response.sendRedirect(lendingUrl);
             return;
@@ -59,7 +69,7 @@
         slip = new BorrowingSlip5();
         slip.setReader(reader);
         slip.setLibrarian((Librarian5) session.getAttribute("member"));
-        slip.setBorrowDate(Html.today());
+        slip.setBorrowDate(Date.valueOf(LocalDate.now()));
         slip.setDueDate(dueDate);
         slip.setDetails(items);
     }
@@ -72,8 +82,8 @@
 
     if (saved) {
         pageTitle = "Phiếu mượn đã lưu";
-        heading = "Đã lưu phiếu mượn " + Html.esc(slip.getBorrowCode());
-        slipCodeText = Html.esc(slip.getBorrowCode());
+        heading = "Đã lưu phiếu mượn " + esc(slip.getBorrowCode());
+        slipCodeText = esc(slip.getBorrowCode());
         stepThreeClass = "done";
     } else {
         pageTitle = "Phiếu mượn";
@@ -104,7 +114,7 @@
 
 <% if (saved) { %>
   <div class="alert alert-success no-print" role="status">
-    Phiếu <b><%= Html.esc(slip.getBorrowCode()) %></b> đã được lưu và đã gửi lệnh in.
+    Phiếu <b><%= esc(slip.getBorrowCode()) %></b> đã được lưu và đã gửi lệnh in.
     Các bản tài liệu đã chuyển sang “Đang được mượn”.
     Nếu máy in chưa in được, bấm “In lại phiếu”, hệ thống không tạo thêm giao dịch mượn.
   </div>
@@ -121,12 +131,12 @@
   <dl class="kv">
     <dt>Độc giả</dt>
     <dd>
-      <%= Html.esc(slip.getReader().getFullName()) %>
-      (<%= Html.esc(slip.getReader().getReaderCode()) %>)
+      <%= esc(slip.getReader().getFullName()) %>
+      (<%= esc(slip.getReader().getReaderCode()) %>)
     </dd>
-    <dt>Nhân viên thực hiện</dt><dd><%= Html.esc(slip.getLibrarian().getFullName()) %></dd>
-    <dt>Ngày mượn</dt><dd><%= Html.date(slip.getBorrowDate()) %></dd>
-    <dt>Hạn trả</dt><dd><%= Html.date(slip.getDueDate()) %></dd>
+    <dt>Nhân viên thực hiện</dt><dd><%= esc(slip.getLibrarian().getFullName()) %></dd>
+    <dt>Ngày mượn</dt><dd><%= date(slip.getBorrowDate()) %></dd>
+    <dt>Hạn trả</dt><dd><%= date(slip.getDueDate()) %></dd>
     <dt>Tổng số bản tài liệu</dt><dd><%= slip.getDetails().size() %></dd>
   </dl>
   <table class="grid">
@@ -141,9 +151,9 @@
     %>
       <tr>
         <td><%= rowNumber %></td>
-        <td class="code"><%= Html.esc(detail.getDocumentCopy().getCopyCode()) %></td>
-        <td><%= Html.esc(detail.getDocumentCopy().getDocument().getTitle()) %></td>
-        <td><%= Html.esc(detail.getConditionOnBorrowing()) %></td>
+        <td class="code"><%= esc(detail.getDocumentCopy().getCopyCode()) %></td>
+        <td><%= esc(detail.getDocumentCopy().getDocument().getTitle()) %></td>
+        <td><%= esc(detail.getConditionOnBorrowing()) %></td>
       </tr>
     <% } %>
     </tbody>

@@ -67,14 +67,4 @@ public class ReaderCard5 {
     public void setReader(Reader5 reader) {
         this.reader = reader;
     }
-
-    /** Thẻ đã hết hạn tính đến ngày today. */
-    public boolean isExpiredOn(Date today) {
-        return expiryDate != null && expiryDate.before(today);
-    }
-
-    /** Thẻ dùng được: đang hoạt động và chưa hết hạn. */
-    public boolean isValidOn(Date today) {
-        return Status5.ACTIVE.equals(cardStatus) && !isExpiredOn(today);
-    }
 }

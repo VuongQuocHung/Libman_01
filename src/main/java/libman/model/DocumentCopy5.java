@@ -56,9 +56,4 @@ public class DocumentCopy5 {
     public void setDocument(Document5 document) {
         this.document = document;
     }
-
-    /** Bản có thể cho mượn: trạng thái "Sẵn có" và không hư hỏng. */
-    public boolean isLendable() {
-        return Status5.COPY_AVAILABLE.equals(usageStatus) && !Status5.COND_DAMAGED.equals(copyCondition);
-    }
 }

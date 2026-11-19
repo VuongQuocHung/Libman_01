@@ -1,5 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="java.sql.SQLException, libman.dao.MemberDAO5, libman.model.*, libman.util.PasswordUtil" %>
+<%@ page import="java.sql.SQLException, libman.dao.MemberDAO5, libman.model.*" %>
 <%
     String ctx = request.getContextPath();
 
@@ -27,9 +27,8 @@
     if (username.isEmpty() || password.isEmpty()) {
         error = "Nhập tên tài khoản và mật khẩu.";
     } else {
-        try {
-            String passwordHash = PasswordUtil.hash(password);
-            member = new MemberDAO5().login(username, passwordHash);
+        try (MemberDAO5 memberDao = new MemberDAO5()) {
+            member = memberDao.login(username, password);
 
             if (member == null) {
                 error = "Tên tài khoản hoặc mật khẩu không đúng.";

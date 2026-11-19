@@ -1,0 +1,26 @@
+<%!
+    // Hai hàm dùng chung cho các trang JSP. Đây là khối khai báo (declaration)
+    // nên hai hàm dùng được ở mọi chỗ trong trang, kể cả phía trên chỗ include.
+
+    /** Escape để chèn an toàn chữ do người dùng nhập hoặc lấy từ CSDL vào HTML. */
+    static String esc(Object value) {
+        if (value == null) {
+            return "";
+        }
+        String text = value.toString();
+        text = text.replace("&", "&amp;");
+        text = text.replace("<", "&lt;");
+        text = text.replace(">", "&gt;");
+        text = text.replace("\"", "&quot;");
+        text = text.replace("'", "&#39;");
+        return text;
+    }
+
+    /** Định dạng ngày dd/MM/yyyy; chuỗi rỗng nếu ngày là null. */
+    static String date(java.sql.Date value) {
+        if (value == null) {
+            return "";
+        }
+        return new java.text.SimpleDateFormat("dd/MM/yyyy").format(value);
+    }
+%>

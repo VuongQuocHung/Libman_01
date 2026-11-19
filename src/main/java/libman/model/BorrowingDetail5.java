@@ -9,11 +9,6 @@ public class BorrowingDetail5 {
     public BorrowingDetail5() {
     }
 
-    public BorrowingDetail5(DocumentCopy5 documentCopy, String conditionOnBorrowing) {
-        this.documentCopy = documentCopy;
-        this.conditionOnBorrowing = conditionOnBorrowing;
-    }
-
     public Integer getId() {
         return id;
     }

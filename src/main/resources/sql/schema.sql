@@ -1,5 +1,9 @@
 -- LibMan - schema MySQL 8 (17 bảng, theo mục 3.2 báo cáo)
--- Quy ước: mỗi lệnh kết thúc bằng dấu; ở cuối dòng. Dòng bắt đầu bằng -- là chú thích.
+-- Chạy: mysql -u root -p < schema.sql   (sau đó chạy data.sql để nạp dữ liệu mẫu)
+
+-- Collation utf8mb4_0900_ai_ci: tìm kiếm không phân biệt hoa/thường và dấu tiếng Việt
+CREATE DATABASE IF NOT EXISTS libman CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+USE libman;
 
 -- ---------- Nhóm con người (kế thừa dùng chung id) ----------
 -- is_active = FALSE nghĩa là tài khoản bị khóa, độc giả cũng không được mượn tài liệu

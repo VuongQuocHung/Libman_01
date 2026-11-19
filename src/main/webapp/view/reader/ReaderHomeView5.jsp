@@ -1,12 +1,13 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="libman.model.*, libman.util.Html" %>
+<%@ page import="libman.model.*" %>
+<%@ include file="/WEB-INF/jspf/checkReader.jspf" %>
 <%
     String pageTitle = "Trang chủ độc giả";
     Reader5 reader = (Reader5) session.getAttribute("member");
 %>
 <%@ include file="/WEB-INF/jspf/header.jspf" %>
 <div class="page-head">
-  <h1>Xin chào, <%= Html.esc(reader.getFullName()) %></h1>
+  <h1>Xin chào, <%= esc(reader.getFullName()) %></h1>
   <p class="lede">Tra cứu tài liệu của thư viện trước khi đến quầy mượn.</p>
 </div>
 

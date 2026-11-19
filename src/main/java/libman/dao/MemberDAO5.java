@@ -1,44 +1,38 @@
 package libman.dao;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import libman.model.Librarian5;
-import libman.model.Manager5;
 import libman.model.Member5;
 import libman.model.Reader5;
-import libman.util.DBUtil;
 
-public class MemberDAO5 {
+public class MemberDAO5 extends DAO5 {
+
+    public MemberDAO5() throws SQLException {
+        super();
+    }
 
     /**
-     * Đăng nhập: trả về Reader5, Librarian5 hoặc Manager5 (tùy vai trò của tài khoản),
-     * hoặc null nếu sai tên tài khoản hoặc mật khẩu.
-     *
-     * @param passwordHash mật khẩu đã băm SHA-256
+     * Đăng nhập: trả về Reader5 hoặc Librarian5 tùy vai trò của tài khoản,
+     * Member5 nếu là vai trò khác, hoặc null nếu sai tên tài khoản hoặc mật khẩu.
+     * Mật khẩu trong CSDL lưu dạng SHA-256 nên câu truy vấn băm mật khẩu bằng SHA2().
      */
-    public Member5 login(String username, String passwordHash) throws SQLException {
-        // Một truy vấn lấy thông tin chung của thành viên và cho biết thành viên đó thuộc vai trò nào
-        String sql = "SELECT " + MemberMapper.MEMBER_COLUMNS + ", "
-                + "r.readerCode, "
-                + "s.staffCode, s.position, s.startDate, "
-                + "l.schedule, "
-                + "mg.`level` AS managerLevel, "
+    public Member5 login(String username, String password) throws SQLException {
+        String sql = "SELECT m.id, m.username, m.fullName, m.birthDate, m.email, m.phone, "
+                + "m.address, m.is_active, "
+                + "r.readerCode, s.staffCode, s.position, s.startDate, l.schedule, "
                 + "(r.id IS NOT NULL) AS isReader, "
-                + "(l.id IS NOT NULL) AS isLibrarian, "
-                + "(mg.id IS NOT NULL) AS isManager "
+                + "(l.id IS NOT NULL) AS isLibrarian "
                 + "FROM tblMember5 m "
                 + "LEFT JOIN tblReader5 r ON r.id = m.id "
                 + "LEFT JOIN tblStaff5 s ON s.id = m.id "
                 + "LEFT JOIN tblLibrarian5 l ON l.id = m.id "
-                + "LEFT JOIN tblManager5 mg ON mg.id = m.id "
-                + "WHERE m.username = ? AND m.password = ?";
+                + "WHERE m.username = ? AND m.password = SHA2(?, 256)";
 
-        try (Connection c = DBUtil.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)) {
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, username);
-            ps.setString(2, passwordHash);
+            ps.setString(2, password);
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (!rs.next()) {
@@ -46,35 +40,31 @@ public class MemberDAO5 {
                 }
 
                 // Tạo đúng loại đối tượng theo vai trò của thành viên
+                Member5 member;
                 if (rs.getBoolean("isReader")) {
                     Reader5 reader = new Reader5();
-                    MemberMapper.fill(reader, rs);
                     reader.setReaderCode(rs.getString("readerCode"));
-                    return reader;
-                }
-
-                if (rs.getBoolean("isLibrarian")) {
+                    member = reader;
+                } else if (rs.getBoolean("isLibrarian")) {
                     Librarian5 librarian = new Librarian5();
-                    MemberMapper.fill(librarian, rs);
                     librarian.setStaffCode(rs.getString("staffCode"));
                     librarian.setPosition(rs.getString("position"));
                     librarian.setStartDate(rs.getDate("startDate"));
                     librarian.setSchedule(rs.getString("schedule"));
-                    return librarian;
+                    member = librarian;
+                } else {
+                    member = new Member5();
                 }
 
-                if (rs.getBoolean("isManager")) {
-                    Manager5 manager = new Manager5();
-                    MemberMapper.fill(manager, rs);
-                    manager.setStaffCode(rs.getString("staffCode"));
-                    manager.setPosition(rs.getString("position"));
-                    manager.setStartDate(rs.getDate("startDate"));
-                    manager.setLevel(rs.getString("managerLevel"));
-                    return manager;
-                }
-
-                Member5 member = new Member5();
-                MemberMapper.fill(member, rs);
+                // Thông tin chung của thành viên
+                member.setId(rs.getInt("id"));
+                member.setUsername(rs.getString("username"));
+                member.setFullName(rs.getString("fullName"));
+                member.setBirthDate(rs.getDate("birthDate"));
+                member.setEmail(rs.getString("email"));
+                member.setPhone(rs.getString("phone"));
+                member.setAddress(rs.getString("address"));
+                member.setActive(rs.getBoolean("is_active"));
                 return member;
             }
         }

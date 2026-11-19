@@ -34,24 +34,6 @@
       <artifactId>mysql-connector-j</artifactId>
       <version>8.3.0</version>
     </dependency>
-    <!-- Connection pool: dùng lại kết nối MySQL thay vì mở mới ở mỗi câu truy vấn -->
-    <dependency>
-      <groupId>com.zaxxer</groupId>
-      <artifactId>HikariCP</artifactId>
-      <version>5.1.0</version>
-    </dependency>
-    <!-- HikariCP ghi log qua SLF4J; slf4j-simple đưa log ra console của Tomcat.
-         Khai báo slf4j-api 2.x để khớp với slf4j-simple (HikariCP 5.1.0 chạy tốt với cả hai). -->
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>2.0.12</version>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
-      <version>2.0.12</version>
-    </dependency>
   </dependencies>
 
   <build>

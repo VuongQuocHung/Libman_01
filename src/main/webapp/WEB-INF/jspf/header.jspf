@@ -1,4 +1,5 @@
-<%@ page import="libman.model.Member5, libman.util.Html, libman.util.Flash" %>
+<%@ page import="libman.model.Member5" %>
+<%@ include file="/WEB-INF/jspf/helpers.jspf" %>
 <%
     // Trang nhúng phải khai báo trước: String pageTitle
     Member5 hdrMember = (Member5) session.getAttribute("member");
@@ -11,11 +12,30 @@
         hdrRoleLabel = "Nhân viên thư viện";
     }
 
-    // Thông báo một lần (sống qua một lần chuyển trang): {loại, nội dung} hoặc null
-    String[] hdrFlash = Flash.take(session);
-    String hdrFlashRole = "status";
-    if (hdrFlash != null && "error".equals(hdrFlash[0])) {
-        hdrFlashRole = "alert";
+    // Chữ cái đầu của tên gọi (từ cuối trong họ tên) để vẽ avatar
+    String hdrInitial = "";
+    if (hdrMember != null && hdrMember.getFullName() != null) {
+        String[] hdrWords = hdrMember.getFullName().trim().split("\\s+");
+        hdrInitial = hdrWords[hdrWords.length - 1].substring(0, 1).toUpperCase();
+    }
+
+    // Thông báo một lần do trang trước để lại trong session (sống qua một lần chuyển trang).
+    // Ba loại: errorMessage, successMessage, infoMessage
+    String hdrMessage = null;
+    String hdrMessageType = null;
+    String[] hdrTypes = {"error", "success", "info"};
+    for (String type : hdrTypes) {
+        String text = (String) session.getAttribute(type + "Message");
+        if (text != null) {
+            hdrMessage = text;
+            hdrMessageType = type;
+            session.removeAttribute(type + "Message");
+        }
+    }
+
+    String hdrMessageRole = "status";
+    if ("error".equals(hdrMessageType)) {
+        hdrMessageRole = "alert";
     }
 %>
 <!DOCTYPE html>
@@ -23,7 +43,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title><%= Html.esc(pageTitle) %> · LibMan</title>
+  <title><%= esc(pageTitle) %> · LibMan</title>
   <link rel="icon" href="data:,">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -40,9 +60,9 @@
     </a>
     <% if (hdrMember != null) { %>
     <div class="userchip">
-      <span class="avatar" aria-hidden="true"><%= Html.esc(hdrMember.getInitial()) %></span>
+      <span class="avatar" aria-hidden="true"><%= esc(hdrInitial) %></span>
       <span class="who">
-        <%= Html.esc(hdrMember.getFullName()) %>
+        <%= esc(hdrMember.getFullName()) %>
         <small><%= hdrRoleLabel %></small>
       </span>
       <a class="logout" href="<%= ctx %>/doLogout.jsp"
@@ -52,8 +72,8 @@
   </div>
 </header>
 <main class="wrap">
-<% if (hdrFlash != null) { %>
-  <div class="alert alert-<%= Html.esc(hdrFlash[0]) %>" role="<%= hdrFlashRole %>">
-    <%= Html.esc(hdrFlash[1]) %>
+<% if (hdrMessage != null) { %>
+  <div class="alert alert-<%= hdrMessageType %>" role="<%= hdrMessageRole %>">
+    <%= esc(hdrMessage) %>
   </div>
 <% } %>
