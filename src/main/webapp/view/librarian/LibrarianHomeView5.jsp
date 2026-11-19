@@ -4,7 +4,7 @@
     String pageTitle = "Trang chủ nhân viên thư viện";
     Librarian5 librarian = (Librarian5) session.getAttribute("member");
     Reader5 lendingReader = (Reader5) session.getAttribute(LendingSession.READER);
-    boolean hasSaved = LendingSession.savedSlipId(session) != null;
+    boolean hasSaved = LendingSession.savedSlip(session) != null;
 %>
 <%@ include file="/WEB-INF/jspf/header.jspf" %>
 <div class="page-head">

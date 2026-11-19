@@ -6,7 +6,7 @@
     String selfUrl = base + "/view/librarian/ReaderIdentificationView5.jsp";
     String lendingUrl = base + "/view/librarian/DocumentLendingView5.jsp";
 
-    if (LendingSession.savedSlipId(session) != null) {
+    if (LendingSession.savedSlip(session) != null) {
         response.sendRedirect(base + "/view/librarian/BorrowingSlipView5.jsp");
         return;
     }

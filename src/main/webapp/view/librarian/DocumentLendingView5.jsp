@@ -6,7 +6,7 @@
     String selfUrl = base + "/view/librarian/DocumentLendingView5.jsp";
 
     // Phiếu đã lưu thì không sửa danh sách nữa: chuyển sang màn phiếu mượn
-    if (LendingSession.savedSlipId(session) != null) {
+    if (LendingSession.savedSlip(session) != null) {
         response.sendRedirect(base + "/view/librarian/BorrowingSlipView5.jsp");
         return;
     }

@@ -11,7 +11,7 @@
         return;
     }
     // Bấm lại / tải lại sau khi đã lưu: không lưu lần hai
-    if (LendingSession.savedSlipId(session) != null) {
+    if (LendingSession.savedSlip(session) != null) {
         response.sendRedirect(slipUrl);
         return;
     }
@@ -37,7 +37,7 @@
 
     try {
         BorrowingSlip5 saved = new BorrowingSlipDAO5().saveBorrowingSlip(slip);
-        session.setAttribute(LendingSession.SAVED, saved.getId());
+        session.setAttribute(LendingSession.SAVED, saved);   // giữ chính phiếu đã lưu để hiển thị, không đọc lại CSDL
         session.setAttribute(LendingSession.JUST_SAVED, Boolean.TRUE);
         session.removeAttribute(LendingSession.ITEMS);
         session.removeAttribute(LendingSession.DUE);

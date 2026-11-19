@@ -13,10 +13,7 @@ import java.util.List;
 import java.util.Set;
 import libman.model.BorrowingDetail5;
 import libman.model.BorrowingSlip5;
-import libman.model.Document5;
 import libman.model.DocumentCopy5;
-import libman.model.Librarian5;
-import libman.model.Reader5;
 import libman.model.Status5;
 import libman.util.DBUtil;
 import libman.util.Html;
@@ -92,59 +89,6 @@ public class BorrowingSlipDAO5 {
                 c.rollback();
                 throw e;
             }
-        }
-    }
-
-    /** Đọc lại phiếu mượn đã lưu để hiển thị/in (kèm độc giả, nhân viên, các bản và tên tài liệu). */
-    public BorrowingSlip5 getBorrowingSlipById(int id) throws SQLException {
-        String sql = "SELECT s.id, s.borrowCode, s.borrowDate, s.dueDate, "
-                + "rm.fullName AS readerName, r.readerCode, lm.fullName AS librarianName, st.staffCode "
-                + "FROM tblBorrowingSlip5 s "
-                + "JOIN tblReader5 r ON r.id = s.readerId JOIN tblMember5 rm ON rm.id = r.id "
-                + "JOIN tblLibrarian5 l ON l.id = s.librarianId JOIN tblStaff5 st ON st.id = l.id "
-                + "JOIN tblMember5 lm ON lm.id = l.id WHERE s.id = ?";
-        try (Connection c = DBUtil.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setInt(1, id);
-            BorrowingSlip5 slip;
-            try (ResultSet rs = ps.executeQuery()) {
-                if (!rs.next()) return null;
-                slip = new BorrowingSlip5();
-                slip.setId(rs.getInt("id"));
-                slip.setBorrowCode(rs.getString("borrowCode"));
-                slip.setBorrowDate(rs.getDate("borrowDate"));
-                slip.setDueDate(rs.getDate("dueDate"));
-                Reader5 reader = new Reader5();
-                reader.setFullName(rs.getString("readerName"));
-                reader.setReaderCode(rs.getString("readerCode"));
-                slip.setReader(reader);
-                Librarian5 lib = new Librarian5();
-                lib.setFullName(rs.getString("librarianName"));
-                lib.setStaffCode(rs.getString("staffCode"));
-                slip.setLibrarian(lib);
-            }
-            String dsql = "SELECT bd.id, bd.conditionOnBorrowing, cp.id AS copyId, cp.copyCode, cp.usageStatus, "
-                    + "d.documentCode, d.title "
-                    + "FROM tblBorrowingDetail5 bd JOIN tblDocumentCopy5 cp ON cp.id = bd.documentCopyId "
-                    + "JOIN tblDocument5 d ON d.id = cp.documentId WHERE bd.borrowingSlipId = ? ORDER BY bd.id";
-            try (PreparedStatement dps = c.prepareStatement(dsql)) {
-                dps.setInt(1, id);
-                try (ResultSet rs = dps.executeQuery()) {
-                    while (rs.next()) {
-                        DocumentCopy5 cp = new DocumentCopy5();
-                        cp.setId(rs.getInt("copyId"));
-                        cp.setCopyCode(rs.getString("copyCode"));
-                        cp.setUsageStatus(rs.getString("usageStatus"));
-                        Document5 doc = new Document5();
-                        doc.setDocumentCode(rs.getString("documentCode"));
-                        doc.setTitle(rs.getString("title"));
-                        cp.setDocument(doc);
-                        BorrowingDetail5 d = new BorrowingDetail5(cp, rs.getString("conditionOnBorrowing"));
-                        d.setId(rs.getInt("id"));
-                        slip.getDetails().add(d);
-                    }
-                }
-            }
-            return slip;
         }
     }
 

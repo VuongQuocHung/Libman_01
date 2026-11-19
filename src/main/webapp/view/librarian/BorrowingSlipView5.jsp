@@ -1,19 +1,19 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="java.sql.Date, java.sql.SQLException, java.util.List, libman.dao.BorrowingSlipDAO5, libman.model.*, libman.util.*" %>
+<%@ page import="java.sql.Date, java.util.List, libman.model.*, libman.util.*" %>
 <%
     String base = request.getContextPath();
     String selfUrl = base + "/view/librarian/BorrowingSlipView5.jsp";
     String lendingUrl = base + "/view/librarian/DocumentLendingView5.jsp";
     String homeUrl = base + "/view/librarian/LibrarianHomeView5.jsp";
-    Integer savedId = LendingSession.savedSlipId(session);
+    BorrowingSlip5 savedSlip = LendingSession.savedSlip(session);
 
     if ("POST".equalsIgnoreCase(request.getMethod())) {
         String action = request.getParameter("action");
-        if ("cancel".equals(action) && savedId == null) {
+        if ("cancel".equals(action) && savedSlip == null) {
             LendingSession.clear(session);
             Flash.info(session, "Đã hủy lượt cho mượn. Chưa có gì được ghi nhận.");
             response.sendRedirect(homeUrl);
-        } else if ("finish".equals(action) && savedId != null) {
+        } else if ("finish".equals(action) && savedSlip != null) {
             LendingSession.clear(session);
             Flash.success(session, "Đã hoàn tất cho mượn.");
             response.sendRedirect(homeUrl);
@@ -24,21 +24,11 @@
     }
 
     BorrowingSlip5 slip;
-    boolean saved = savedId != null;
+    boolean saved = savedSlip != null;
     boolean printNow = false;
     if (saved) {
-        try {
-            slip = new BorrowingSlipDAO5().getBorrowingSlipById(savedId);
-        } catch (SQLException e) {
-            application.log("BorrowingSlipView5: lỗi CSDL", e);
-            slip = null;
-        }
-        if (slip == null) {
-            LendingSession.clear(session);
-            Flash.error(session, "Không đọc lại được phiếu mượn vừa lưu. Phiếu đã được ghi nhận, hãy kiểm tra lại trong hệ thống.");
-            response.sendRedirect(homeUrl);
-            return;
-        }
+        // Hiển thị thẳng phiếu mà saveBorrowingSlip() đã trả về (có mã phiếu), không đọc lại CSDL
+        slip = savedSlip;
         // Chỉ gửi lệnh in tự động đúng một lần ngay sau khi lưu
         printNow = Boolean.TRUE.equals(session.getAttribute(LendingSession.JUST_SAVED));
         session.removeAttribute(LendingSession.JUST_SAVED);
