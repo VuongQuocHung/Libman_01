@@ -32,7 +32,7 @@
             if (copy == null) {
                 problems.add("Không tìm thấy bản tài liệu có mã “" + code + "”.");
             } else {
-                doc = new DocumentDAO5().getDocumentByCode(copy.getDocument().getDocumentCode());
+                doc = copy.getDocument();   // bản tài liệu đã kèm sẵn đầu tài liệu, không gọi DocumentDAO5
                 if (doc == null || !doc.isInUse()) {
                     problems.add("Tài liệu của bản này đã ngừng sử dụng.");
                 } else if (!Status5.COPY_AVAILABLE.equals(copy.getUsageStatus())) {
@@ -69,7 +69,6 @@
             Flash.error(session, "Bản " + copy.getCopyCode() + " bị hư hỏng nên không thể cho mượn. Hãy báo nhân viên xử lí.");
             response.sendRedirect(selfUrl + "?copyCode=" + Html.url(code));
         } else {
-            copy.setDocument(doc);   // giữ tên và mã tài liệu để hiển thị trong danh sách
             LendingSession.items(session).add(new BorrowingDetail5(copy, cond));
             Flash.success(session, "Đã thêm bản " + copy.getCopyCode() + " (" + doc.getTitle() + ") vào danh sách.");
             response.sendRedirect(lendingUrl);

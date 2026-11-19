@@ -12,9 +12,12 @@ import libman.util.DBUtil;
 
 public class DocumentDAO5 {
 
-    private static final String SELECT =
-            "SELECT id, documentCode, title, documentType, author, publisher, `year`, description, "
-            + "language, pageCount, documentStatus FROM tblDocument5 ";
+    /** Các cột của tblDocument5 (bí danh d), dùng chung với DocumentCopyDAO5 khi JOIN. */
+    static final String DOCUMENT_COLUMNS =
+            "d.id, d.documentCode, d.title, d.documentType, d.author, d.publisher, d.`year`, d.description, "
+            + "d.language, d.pageCount, d.documentStatus";
+
+    private static final String SELECT = "SELECT " + DOCUMENT_COLUMNS + " FROM tblDocument5 d ";
 
     /** Số tài liệu mỗi trang kết quả tìm kiếm. */
     public static final int PAGE_SIZE = 10;
@@ -72,7 +75,8 @@ public class DocumentDAO5 {
         return s.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_");
     }
 
-    private static Document5 map(ResultSet rs) throws SQLException {
+    /** Đóng gói Document5 từ các cột DOCUMENT_COLUMNS (dùng chung trong package dao). */
+    static Document5 map(ResultSet rs) throws SQLException {
         Document5 d = new Document5();
         d.setId(rs.getInt("id"));
         d.setDocumentCode(rs.getString("documentCode"));

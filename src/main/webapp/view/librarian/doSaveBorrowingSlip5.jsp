@@ -32,12 +32,8 @@
     slip.setLibrarian(librarian);
     slip.setBorrowDate(Html.today());
     slip.setDueDate(due);
-    for (BorrowingDetail5 d : items) {
-        BorrowingDetail5 detail = new BorrowingDetail5();
-        detail.setDocumentCopy(d.getDocumentCopy());
-        detail.setConditionOnBorrowing(d.getConditionOnBorrowing());
-        slip.getDetails().add(detail);
-    }
+    // Các chi tiết phiếu mượn đã được tạo lúc thêm từng bản vào danh sách, chỉ cần thiết lập vào phiếu
+    slip.setDetails(new ArrayList<>(items));
 
     try {
         BorrowingSlip5 saved = new BorrowingSlipDAO5().saveBorrowingSlip(slip);

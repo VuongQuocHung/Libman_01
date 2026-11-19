@@ -57,25 +57,28 @@ public class DocumentCopyDAO5 {
         return result;
     }
 
-    /** Tìm bản tài liệu theo mã bản (quét mã); Document5 bên trong chỉ có id và mã đầu tài liệu. */
+    /**
+     * Tìm bản tài liệu theo mã bản (quét mã), kèm đầy đủ thông tin đầu tài liệu, trong một truy vấn;
+     * null nếu không có. cp.id đặt bí danh copyId để không trùng với cột d.id của đầu tài liệu.
+     */
     public DocumentCopy5 getCopyByCode(String copyCode) throws SQLException {
-        String sql = "SELECT cp.id, cp.copyCode, cp.location, cp.copyCondition, cp.usageStatus, "
-                + "d.id AS documentId, d.documentCode "
+        String sql = "SELECT cp.id AS copyId, cp.copyCode, cp.location, cp.copyCondition, cp.usageStatus, "
+                + DocumentDAO5.DOCUMENT_COLUMNS + " "
                 + "FROM tblDocumentCopy5 cp JOIN tblDocument5 d ON d.id = cp.documentId WHERE cp.copyCode = ?";
         try (Connection c = DBUtil.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setString(1, copyCode);
             try (ResultSet rs = ps.executeQuery()) {
                 if (!rs.next()) return null;
+                // Đóng gói bản tài liệu trước, sau đó đóng gói đầu tài liệu rồi gắn vào bản
                 DocumentCopy5 cp = new DocumentCopy5();
-                cp.setId(rs.getInt("id"));
+                cp.setId(rs.getInt("copyId"));
                 cp.setCopyCode(rs.getString("copyCode"));
                 cp.setLocation(rs.getString("location"));
                 cp.setCopyCondition(rs.getString("copyCondition"));
                 cp.setUsageStatus(rs.getString("usageStatus"));
-                Document5 d = new Document5();
-                d.setId(rs.getInt("documentId"));
-                d.setDocumentCode(rs.getString("documentCode"));
-                cp.setDocument(d);
+
+                Document5 document = DocumentDAO5.map(rs);
+                cp.setDocument(document);
                 return cp;
             }
         }
