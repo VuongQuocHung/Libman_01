@@ -24,34 +24,69 @@ public class AuthFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-        HttpServletRequest req = (HttpServletRequest) request;
-        HttpServletResponse res = (HttpServletResponse) response;
-        String ctx = req.getContextPath();
+        HttpServletRequest httpRequest = (HttpServletRequest) request;
+        HttpServletResponse httpResponse = (HttpServletResponse) response;
+        String contextPath = httpRequest.getContextPath();
 
-        // Không cho trình duyệt cache trang đã đăng nhập (tránh bấm Back sau khi đăng xuất)
-        res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
-        res.setHeader("Pragma", "no-cache");
-        res.setDateHeader("Expires", 0);
+        disableBrowserCache(httpResponse);
 
-        HttpSession session = req.getSession(false);
-        String role = session == null ? null : (String) session.getAttribute("role");
+        // Chưa đăng nhập thì chuyển về trang đăng nhập
+        String role = getRole(httpRequest);
         if (role == null) {
-            res.sendRedirect(ctx + "/login.jsp");
+            httpResponse.sendRedirect(contextPath + "/login.jsp");
             return;
         }
 
-        // Phải dùng đường dẫn đã được container chuẩn hóa (bỏ "//", "/./", "/../", ";param").
-        // getRequestURI() là chuỗi thô: "/view//librarian/..." sẽ lọt qua phép so tiền tố.
-        String path = req.getServletPath() + (req.getPathInfo() == null ? "" : req.getPathInfo());
-
-        // Đóng mặc định: chỉ cho qua đúng cặp (khu vực, vai trò); mọi đường dẫn /view/* khác đều bị từ chối.
-        boolean allowed =
-                (path.startsWith("/view/reader/") && ROLE_READER.equals(role))
-                || (path.startsWith("/view/librarian/") && ROLE_LIBRARIAN.equals(role));
-        if (!allowed) {
-            res.sendRedirect(ctx + "/index.jsp");
+        // Đăng nhập rồi nhưng vào sai khu vực thì đưa về trang chủ của đúng vai trò
+        String path = getNormalizedPath(httpRequest);
+        if (!isAllowed(path, role)) {
+            httpResponse.sendRedirect(contextPath + "/index.jsp");
             return;
         }
+
         chain.doFilter(request, response);
+    }
+
+    /** Không cho trình duyệt lưu lại trang đã đăng nhập (tránh bấm Back sau khi đăng xuất vẫn thấy trang). */
+    private static void disableBrowserCache(HttpServletResponse response) {
+        response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
+        response.setHeader("Pragma", "no-cache");
+        response.setDateHeader("Expires", 0);
+    }
+
+    /** Vai trò của người dùng đang đăng nhập; null nếu chưa đăng nhập. */
+    private static String getRole(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            return null;
+        }
+        return (String) session.getAttribute("role");
+    }
+
+    /**
+     * Đường dẫn đã được container chuẩn hóa (bỏ "//", "/./", "/../", ";param").
+     * Không dùng getRequestURI() vì đó là chuỗi thô: "/view//librarian/..." sẽ lọt qua phép so tiền tố.
+     */
+    private static String getNormalizedPath(HttpServletRequest request) {
+        String path = request.getServletPath();
+        String pathInfo = request.getPathInfo();
+        if (pathInfo != null) {
+            path = path + pathInfo;
+        }
+        return path;
+    }
+
+    /** Đóng mặc định: chỉ cho qua đúng cặp (khu vực, vai trò); mọi đường dẫn /view/* khác đều bị từ chối. */
+    private static boolean isAllowed(String path, String role) {
+        boolean isReaderArea = path.startsWith("/view/reader/");
+        boolean isLibrarianArea = path.startsWith("/view/librarian/");
+
+        if (isReaderArea && ROLE_READER.equals(role)) {
+            return true;
+        }
+        if (isLibrarianArea && ROLE_LIBRARIAN.equals(role)) {
+            return true;
+        }
+        return false;
     }
 }

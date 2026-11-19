@@ -41,3 +41,5 @@ build/
 ### LibMan: cấu hình cục bộ có mật khẩu, không đưa lên Git ###
 src/main/resources/db.properties
 .playwright-mcp/
+
+CLAUDE.md

@@ -8,13 +8,16 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
 
-/** Đọc tham số form tiếng Việt đúng UTF-8. */
+/** Đọc dữ liệu form tiếng Việt đúng bảng mã UTF-8. */
 @WebFilter("/*")
 public class EncodingFilter implements Filter {
+
     @Override
-    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-        if (req.getCharacterEncoding() == null) req.setCharacterEncoding("UTF-8");
-        chain.doFilter(req, res);
+        if (request.getCharacterEncoding() == null) {
+            request.setCharacterEncoding("UTF-8");
+        }
+        chain.doFilter(request, response);
     }
 }

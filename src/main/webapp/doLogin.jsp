@@ -2,20 +2,35 @@
 <%@ page import="java.sql.SQLException, libman.dao.MemberDAO5, libman.model.*, libman.util.PasswordUtil" %>
 <%
     String ctx = request.getContextPath();
+
+    // Chỉ nhận yêu cầu POST từ form đăng nhập
     if (!"POST".equalsIgnoreCase(request.getMethod())) {
         response.sendRedirect(ctx + "/login.jsp");
         return;
     }
-    String username = request.getParameter("username") == null ? "" : request.getParameter("username").trim();
-    String password = request.getParameter("password") == null ? "" : request.getParameter("password");
 
+    // Đọc tên tài khoản và mật khẩu người dùng nhập
+    String username = "";
+    if (request.getParameter("username") != null) {
+        username = request.getParameter("username").trim();
+    }
+
+    String password = "";
+    if (request.getParameter("password") != null) {
+        password = request.getParameter("password");
+    }
+
+    // kiểm tra tài khoản
     String error = null;
     Member5 member = null;
+
     if (username.isEmpty() || password.isEmpty()) {
         error = "Nhập tên tài khoản và mật khẩu.";
     } else {
         try {
-            member = new MemberDAO5().login(username, PasswordUtil.hash(password));
+            String passwordHash = PasswordUtil.hash(password);
+            member = new MemberDAO5().login(username, passwordHash);
+
             if (member == null) {
                 error = "Tên tài khoản hoặc mật khẩu không đúng.";
             } else if (!member.isActive()) {
@@ -25,10 +40,12 @@
             }
         } catch (SQLException e) {
             application.log("Đăng nhập: lỗi CSDL", e);
-            error = "Không kết nối được cơ sở dữ liệu. Kiểm tra db.username và db.password trong db.properties.";
+            error = "Không kết nối được cơ sở dữ liệu. "
+                    + "Kiểm tra db.username và db.password trong db.properties.";
         }
     }
 
+    // Có lỗi thì quay lại trang đăng nhập, giữ lại tên tài khoản đã nhập
     if (error != null) {
         session.setAttribute("loginError", error);
         session.setAttribute("loginUser", username);
@@ -36,10 +53,19 @@
         return;
     }
 
-    // Đăng nhập thành công: đổi session id để chống session fixation
+    // đăng nhập thành công
+    // Đổi session id để chống tấn công cố định phiên (session fixation)
     request.changeSessionId();
     member.setPassword(null);
+
+    String role;
+    if (member instanceof Reader5) {
+        role = "READER";
+    } else {
+        role = "LIBRARIAN";
+    }
+
     session.setAttribute("member", member);
-    session.setAttribute("role", member instanceof Reader5 ? "READER" : "LIBRARIAN");
+    session.setAttribute("role", role);
     response.sendRedirect(ctx + "/index.jsp");
 %>

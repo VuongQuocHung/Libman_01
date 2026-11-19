@@ -2,7 +2,8 @@ package libman.model;
 
 /** Các giá trị trạng thái dùng chung (khớp với dữ liệu trong CSDL). */
 public final class Status5 {
-    private Status5() {}
+    private Status5() {
+    }
 
     public static final String ACTIVE = "Đang hoạt động";
     public static final String LOCKED = "Bị khóa";

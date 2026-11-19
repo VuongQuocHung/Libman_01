@@ -4,19 +4,27 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-/** Băm mật khẩu SHA-256 (hex thường), khớp với dữ liệu mẫu trong data.sql. */
+/** Băm mật khẩu SHA-256 (chuỗi hex thường), khớp với dữ liệu mẫu trong data.sql. */
 public final class PasswordUtil {
-    private PasswordUtil() {}
 
-    public static String hash(String plain) {
+    private PasswordUtil() {
+    }
+
+    public static String hash(String plainPassword) {
         try {
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            byte[] d = md.digest(plain.getBytes(StandardCharsets.UTF_8));
-            StringBuilder sb = new StringBuilder(d.length * 2);
-            for (byte b : d) sb.append(String.format("%02x", b));
-            return sb.toString();
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hashBytes = digest.digest(plainPassword.getBytes(StandardCharsets.UTF_8));
+            return toHex(hashBytes);
         } catch (NoSuchAlgorithmException e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    private static String toHex(byte[] bytes) {
+        StringBuilder hex = new StringBuilder(bytes.length * 2);
+        for (byte b : bytes) {
+            hex.append(String.format("%02x", b));
+        }
+        return hex.toString();
     }
 }

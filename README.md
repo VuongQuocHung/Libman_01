@@ -33,7 +33,7 @@ Mã bản để thử: `BTL001`–`BTL013` (BTL004, 005, 008 đang được mư�
 src/main/java/libman/
   model/   Member5, Reader5, Staff5, Librarian5, Document5, DocumentCopy5, ReaderCard5,
            BorrowingSlip5, BorrowingDetail5 ...
-  dao/     MemberDAO5, ReaderDAO5, ReaderCardDAO5, DocumentDAO5, DocumentCopyDAO5, BorrowingSlipDAO5
+  dao/     MemberDAO5, ReaderCardDAO5, DocumentDAO5, DocumentCopyDAO5, BorrowingSlipDAO5
   util/    DBUtil, DatabaseInitializer, LendingSession, Html, Flash, PasswordUtil
   web/     AuthFilter (phân quyền theo vai trò), EncodingFilter
 src/main/webapp/

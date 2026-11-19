@@ -1,10 +1,19 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="java.util.List, libman.model.*, libman.util.Html, libman.util.LendingSession" %>
+<%@ page import="libman.model.*, libman.util.Html, libman.util.LendingSession" %>
 <%
     String pageTitle = "Trang chủ nhân viên thư viện";
     Librarian5 librarian = (Librarian5) session.getAttribute("member");
+
+    // Nếu có một lượt cho mượn đang dở thì hiện đường dẫn để nhân viên làm tiếp
     Reader5 lendingReader = (Reader5) session.getAttribute(LendingSession.READER);
-    boolean hasSaved = LendingSession.savedSlip(session) != null;
+    boolean hasSavedSlip = LendingSession.savedSlip(session) != null;
+
+    String continuePage;
+    if (hasSavedSlip) {
+        continuePage = "BorrowingSlipView5.jsp";
+    } else {
+        continuePage = "DocumentLendingView5.jsp";
+    }
 %>
 <%@ include file="/WEB-INF/jspf/header.jspf" %>
 <div class="page-head">
@@ -15,14 +24,17 @@
 <% if (lendingReader != null) { %>
   <div class="alert alert-warn">
     Đang có một lượt cho mượn chưa xong, độc giả <b><%= Html.esc(lendingReader.getFullName()) %></b>.
-    <a href="<%= ctx %>/view/librarian/<%= hasSaved ? "BorrowingSlipView5.jsp" : "DocumentLendingView5.jsp" %>">Tiếp tục</a>
+    <a href="<%= ctx %>/view/librarian/<%= continuePage %>">Tiếp tục</a>
   </div>
 <% } %>
 
 <div class="tiles">
   <a class="tile" href="<%= ctx %>/view/librarian/DocumentLendingView5.jsp">
-    <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <path d="M6 9h10a4 4 0 0 1 4 4v18a3 3 0 0 0-3-3H6z"/><path d="M34 9H24a4 4 0 0 0-4 4v18a3 3 0 0 1 3-3h11z"/><path d="M26 17h5M26 22h5"/>
+    <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2.2"
+         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M6 9h10a4 4 0 0 1 4 4v18a3 3 0 0 0-3-3H6z"/>
+      <path d="M34 9H24a4 4 0 0 0-4 4v18a3 3 0 0 1 3-3h11z"/>
+      <path d="M26 17h5M26 22h5"/>
     </svg>
     <div>
       <h3>Quản lí mượn tài liệu</h3>

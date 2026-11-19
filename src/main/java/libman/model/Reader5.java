@@ -4,6 +4,11 @@ package libman.model;
 public class Reader5 extends Member5 {
     private String readerCode;
 
-    public String getReaderCode() { return readerCode; }
-    public void setReaderCode(String readerCode) { this.readerCode = readerCode; }
+    public String getReaderCode() {
+        return readerCode;
+    }
+
+    public void setReaderCode(String readerCode) {
+        this.readerCode = readerCode;
+    }
 }

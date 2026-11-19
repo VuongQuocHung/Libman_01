@@ -3,48 +3,78 @@ package libman.util;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.sql.Date;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 /** Hàm trợ giúp cho JSP: escape HTML, định dạng ngày, mã hóa URL. */
 public final class Html {
-    private Html() {}
 
-    private static final DateTimeFormatter VN = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    private Html() {
+    }
 
-    /** Escape để chèn an toàn vào nội dung/thuộc tính HTML. */
-    public static String esc(Object o) {
-        if (o == null) return "";
-        String s = o.toString();
-        StringBuilder sb = new StringBuilder(s.length() + 16);
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            switch (c) {
-                case '&': sb.append("&amp;"); break;
-                case '<': sb.append("&lt;"); break;
-                case '>': sb.append("&gt;"); break;
-                case '"': sb.append("&quot;"); break;
-                case '\'': sb.append("&#39;"); break;
-                default: sb.append(c);
+    private static final DateTimeFormatter VIETNAM_DATE = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+    /** Escape để chèn an toàn vào nội dung hoặc thuộc tính HTML. */
+    public static String esc(Object value) {
+        if (value == null) {
+            return "";
+        }
+
+        String text = value.toString();
+        StringBuilder result = new StringBuilder(text.length() + 16);
+
+        for (int i = 0; i < text.length(); i++) {
+            char ch = text.charAt(i);
+            switch (ch) {
+                case '&':
+                    result.append("&amp;");
+                    break;
+                case '<':
+                    result.append("&lt;");
+                    break;
+                case '>':
+                    result.append("&gt;");
+                    break;
+                case '"':
+                    result.append("&quot;");
+                    break;
+                case '\'':
+                    result.append("&#39;");
+                    break;
+                default:
+                    result.append(ch);
+                    break;
             }
         }
-        return sb.toString();
+        return result.toString();
     }
 
-    /** dd/MM/yyyy */
-    public static String date(Date d) {
-        return d == null ? "" : d.toLocalDate().format(VN);
+    /** Định dạng dd/MM/yyyy; chuỗi rỗng nếu ngày là null. */
+    public static String date(Date date) {
+        if (date == null) {
+            return "";
+        }
+        return date.toLocalDate().format(VIETNAM_DATE);
     }
 
-    /** yyyy-MM-dd (cho input type="date") */
-    public static String iso(Date d) {
-        return d == null ? "" : d.toLocalDate().toString();
+    /** Định dạng yyyy-MM-dd (dùng cho input type="date"); chuỗi rỗng nếu ngày là null. */
+    public static String iso(Date date) {
+        if (date == null) {
+            return "";
+        }
+        return date.toLocalDate().toString();
     }
 
-    public static String url(String s) {
-        return s == null ? "" : URLEncoder.encode(s, StandardCharsets.UTF_8);
+    /** Mã hóa để đưa vào tham số trên URL; chuỗi rỗng nếu text là null. */
+    public static String url(String text) {
+        if (text == null) {
+            return "";
+        }
+        return URLEncoder.encode(text, StandardCharsets.UTF_8);
     }
 
+    /** Ngày hôm nay. */
     public static Date today() {
-        return Date.valueOf(java.time.LocalDate.now());
+        return Date.valueOf(LocalDate.now());
     }
 }
