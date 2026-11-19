@@ -24,13 +24,16 @@
 
     if (searched) {
         try {
+            // Thẻ trả về đã kèm đầy đủ thông tin độc giả, không cần gọi ReaderDAO5 thêm
             ReaderCardDAO5 cardDao = new ReaderCardDAO5();
-            ReaderDAO5 readerDao = new ReaderDAO5();
             card = cardDao.getCardByCode(code);
-            if (card == null) card = cardDao.getCardByReaderCode(code);
-            reader = card != null
-                    ? readerDao.getReaderByCode(card.getReader().getReaderCode())
-                    : readerDao.getReaderByCode(code);   // độc giả có thể chưa có thẻ
+            if (card == null) card = cardDao.getCardByReaderCode(code);   // mã nhập có thể là mã độc giả
+            if (card != null) {
+                reader = card.getReader();
+            } else {
+                // Không có thẻ nào: tra xem có phải độc giả chưa được cấp thẻ để báo đúng lí do
+                reader = new ReaderDAO5().getReaderByCode(code);
+            }
 
             if (reader == null) {
                 problems.add("Không tìm thấy thẻ hoặc độc giả có mã “" + code + "”.");
