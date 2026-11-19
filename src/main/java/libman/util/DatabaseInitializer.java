@@ -44,6 +44,7 @@ public class DatabaseInitializer implements ServletContextListener {
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
+        DBUtil.shutdown();   // đóng connection pool trước, tránh rò rỉ luồng khi redeploy
         // Gỡ JDBC driver của ứng dụng để Tomcat không báo rò rỉ bộ nhớ khi undeploy
         ClassLoader cl = getClass().getClassLoader();
         Enumeration<Driver> drivers = DriverManager.getDrivers();

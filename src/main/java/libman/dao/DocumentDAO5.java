@@ -16,16 +16,40 @@ public class DocumentDAO5 {
             "SELECT id, documentCode, title, documentType, author, publisher, `year`, description, "
             + "language, pageCount, documentStatus FROM tblDocument5 ";
 
+    /** Số tài liệu mỗi trang kết quả tìm kiếm. */
+    public static final int PAGE_SIZE = 10;
+
     /**
-     * Tìm các đầu tài liệu đang sử dụng có tên chứa từ khóa.
-     * (Collation utf8mb4_0900_ai_ci nên không phân biệt hoa/thường và dấu tiếng Việt.)
+     * Đếm các đầu tài liệu đang sử dụng có tên chứa từ khóa (để tính số trang).
      */
-    public List<Document5> getDocumentByTitle(String keyword) throws SQLException {
-        String sql = SELECT + "WHERE documentStatus = ? AND title LIKE ? ORDER BY title, documentCode";
+    public int countDocumentByTitle(String keyword) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM tblDocument5 WHERE documentStatus = ? AND title LIKE ?";
+        try (Connection c = DBUtil.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, Status5.DOC_ACTIVE);
+            ps.setString(2, "%" + escapeLike(keyword) + "%");
+            try (ResultSet rs = ps.executeQuery()) {
+                rs.next();
+                return rs.getInt(1);
+            }
+        }
+    }
+
+    /**
+     * Tìm các đầu tài liệu đang sử dụng có tên chứa từ khóa, lấy một trang kết quả.
+     * (Collation utf8mb4_0900_ai_ci nên không phân biệt hoa/thường và dấu tiếng Việt.)
+     *
+     * @param page     số trang, đếm từ 1
+     * @param pageSize số tài liệu mỗi trang
+     */
+    public List<Document5> getDocumentByTitle(String keyword, int page, int pageSize) throws SQLException {
+        String sql = SELECT + "WHERE documentStatus = ? AND title LIKE ? "
+                + "ORDER BY title, documentCode LIMIT ? OFFSET ?";
         List<Document5> list = new ArrayList<>();
         try (Connection c = DBUtil.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setString(1, Status5.DOC_ACTIVE);
             ps.setString(2, "%" + escapeLike(keyword) + "%");
+            ps.setInt(3, pageSize);
+            ps.setInt(4, (Math.max(page, 1) - 1) * pageSize);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) list.add(map(rs));
             }

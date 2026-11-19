@@ -135,6 +135,8 @@ table.grid td a.title:hover { color: var(--green); text-decoration: underline; }
 .badge-bad { background: var(--red-bg); color: var(--red); }
 .badge-muted { background: #e9edf2; color: var(--muted); }
 
+.pager { display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line-soft); }
+
 /* ---------- chỉ số bản có thể mượn: mỗi ô vuông là một bản vật lí ---------- */
 .meter { display: inline-flex; gap: 3px; vertical-align: middle; }
 .meter i { width: 11px; height: 17px; border-radius: 2px; background: var(--green); display: block; }
