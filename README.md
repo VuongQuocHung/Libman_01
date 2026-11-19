@@ -40,15 +40,12 @@ src/main/webapp/
   login.jsp, doLogin.jsp, doLogout.jsp
   view/reader/     ReaderHomeView5, DocumentSearchView5, DocumentDetailView5
   view/librarian/  LibrarianHomeView5, DocumentLendingView5, ReaderIdentificationView5,
-                   DocumentCopySelectionView5, BorrowingSlipView5, doSaveBorrowingSlip5
+  DocumentCopySelectionView5, BorrowingSlipView5, doSaveBorrowingSlip5
 ```
 
 ## Khác biệt nhỏ so với báo cáo
 
 - Cột `condition` của `tblDocumentCopy5` đặt tên `copyCondition` (CONDITION là từ khóa MySQL).
-- Thêm vài cột báo cáo có nhắc ở phần đặc tả nhưng chưa có trong bảng CSDL: `tblMember5.birthDate`,
-  `accountStatus`; `tblReader5.registerDate`, `readerStatus`; `tblDocument5.language`, `pageCount`,
-  `documentStatus`; `tblFineDetail5.violationType`.
 - Mã phiếu mượn sinh tự động dạng `PM` + số thứ tự 3 chữ số (PM001, PM002, ...).
 - Mật khẩu lưu dạng SHA-256 (đủ cho bài tập; hệ thống thật nên dùng bcrypt/argon2 có salt).
 - Hạn trả mặc định gợi ý 30 ngày (`LendingSession.DEFAULT_LOAN_DAYS`), nhân viên sửa được.
