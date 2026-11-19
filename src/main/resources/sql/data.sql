@@ -1,13 +1,13 @@
 -- LibMan - dữ liệu mẫu (lấy theo kịch bản trong báo cáo). Mật khẩu mọi tài khoản: 123456
 -- (lưu dạng SHA-256: 8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92)
 
-INSERT INTO tblMember5 (id, username, password, fullName, birthDate, email, phone, address, accountStatus) VALUES
- (1, 'quanly', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'Nguyễn Thị Lan', '1985-05-20', 'lan.nt@libman.edu.vn', '0911111111', 'Hà Nội', 'Đang hoạt động'),
- (2, 'mai',    '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'Trần Thị Mai',    '1992-03-15', 'mai.tt@libman.edu.vn', '0922222222', 'Hà Nội', 'Đang hoạt động'),
- (3, 'hung',   '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'Vương Quốc Hưng', '2005-01-01', 'vqh@gmail.com',        '0123456789', 'Hà Nội', 'Đang hoạt động'),
- (4, 'an',     '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'Nguyễn Văn An',   '2004-07-09', 'an.nv@gmail.com',      '0933333333', 'Hải Phòng', 'Đang hoạt động'),
- (5, 'binh',   '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'Lê Thị Bình',     '2005-11-23', 'binh.lt@gmail.com',    '0944444444', 'Nam Định', 'Đang hoạt động'),
- (6, 'duc',    '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'Phạm Minh Đức',   '2004-02-02', 'duc.pm@gmail.com',     '0955555555', 'Hà Nội', 'Đang hoạt động');
+INSERT INTO tblMember5 (id, username, password, fullName, birthDate, email, phone, address, is_active) VALUES
+ (1, 'quanly', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'Nguyễn Thị Lan', '1985-05-20', 'lan.nt@libman.edu.vn', '0911111111', 'Hà Nội', TRUE),
+ (2, 'mai',    '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'Trần Thị Mai',    '1992-03-15', 'mai.tt@libman.edu.vn', '0922222222', 'Hà Nội', TRUE),
+ (3, 'hung',   '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'Vương Quốc Hưng', '2005-01-01', 'vqh@gmail.com',        '0123456789', 'Hà Nội', TRUE),
+ (4, 'an',     '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'Nguyễn Văn An',   '2004-07-09', 'an.nv@gmail.com',      '0933333333', 'Hải Phòng', TRUE),
+ (5, 'binh',   '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'Lê Thị Bình',     '2005-11-23', 'binh.lt@gmail.com',    '0944444444', 'Nam Định', TRUE),
+ (6, 'duc',    '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'Phạm Minh Đức',   '2004-02-02', 'duc.pm@gmail.com',     '0955555555', 'Hà Nội', TRUE);
 
 INSERT INTO tblStaff5 (id, staffCode, position, startDate) VALUES
  (1, 'QL001', 'Trưởng phòng thư viện', '2015-09-01'),
@@ -16,11 +16,11 @@ INSERT INTO tblStaff5 (id, staffCode, position, startDate) VALUES
 INSERT INTO tblManager5 (id, `level`) VALUES (1, 'Cấp 1');
 INSERT INTO tblLibrarian5 (id, schedule) VALUES (2, 'Ca sáng');
 
-INSERT INTO tblReader5 (id, readerCode, registerDate, readerStatus) VALUES
- (3, 'BD001', '2023-12-31', 'Đang hoạt động'),
- (4, 'BD002', '2021-01-01', 'Đang hoạt động'),
- (5, 'BD003', '2023-06-10', 'Đang hoạt động'),
- (6, 'BD004', '2024-01-15', 'Đang hoạt động');
+INSERT INTO tblReader5 (id, readerCode) VALUES
+ (3, 'BD001'),
+ (4, 'BD002'),
+ (5, 'BD003'),
+ (6, 'BD004');
 
 -- THE001: hợp lệ (đúng kịch bản báo cáo). THE002: đã hết hạn. THE003: bị khóa. THE004: hợp lệ.
 INSERT INTO tblReaderCard5 (id, cardCode, registrationDate, expiryDate, cardStatus, readerId) VALUES

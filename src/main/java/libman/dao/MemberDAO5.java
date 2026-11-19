@@ -18,7 +18,7 @@ public class MemberDAO5 {
      */
     public Member5 login(String username, String passwordHash) throws SQLException {
         String sql = "SELECT " + MemberMapper.MEMBER_COLUMNS + ", "
-                + "r.readerCode, r.registerDate, r.readerStatus, "
+                + "r.readerCode, "
                 + "s.staffCode, s.position, s.startDate, l.schedule, mg.`level` AS mgLevel, "
                 + "(r.id IS NOT NULL) AS isReader, (l.id IS NOT NULL) AS isLibrarian, (mg.id IS NOT NULL) AS isManager "
                 + "FROM tblMember5 m "
@@ -36,8 +36,6 @@ public class MemberDAO5 {
                     Reader5 r = new Reader5();
                     MemberMapper.fill(r, rs);
                     r.setReaderCode(rs.getString("readerCode"));
-                    r.setRegisterDate(rs.getDate("registerDate"));
-                    r.setReaderStatus(rs.getString("readerStatus"));
                     return r;
                 }
                 if (rs.getBoolean("isLibrarian")) {

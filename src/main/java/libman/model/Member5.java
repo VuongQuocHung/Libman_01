@@ -12,7 +12,7 @@ public class Member5 {
     private String email;
     private String phone;
     private String address;
-    private String accountStatus;
+    private boolean active;
 
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
@@ -30,10 +30,9 @@ public class Member5 {
     public void setPhone(String phone) { this.phone = phone; }
     public String getAddress() { return address; }
     public void setAddress(String address) { this.address = address; }
-    public String getAccountStatus() { return accountStatus; }
-    public void setAccountStatus(String accountStatus) { this.accountStatus = accountStatus; }
-
-    public boolean isAccountActive() { return Status5.ACTIVE.equals(accountStatus); }
+    /** false = tài khoản bị khóa; với độc giả còn nghĩa là ngừng quyền mượn. */
+    public boolean isActive() { return active; }
+    public void setActive(boolean active) { this.active = active; }
 
     /** Chữ cái đầu của tên gọi (từ cuối trong họ tên) để vẽ avatar. */
     public String getInitial() {

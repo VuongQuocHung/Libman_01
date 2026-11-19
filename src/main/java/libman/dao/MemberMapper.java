@@ -10,7 +10,7 @@ final class MemberMapper {
 
     /** Danh sách cột tblMember5 (bí danh m) dùng chung cho các câu SELECT. */
     static final String MEMBER_COLUMNS =
-            "m.id, m.username, m.fullName, m.birthDate, m.email, m.phone, m.address, m.accountStatus";
+            "m.id, m.username, m.fullName, m.birthDate, m.email, m.phone, m.address, m.is_active";
 
     static void fill(Member5 m, ResultSet rs) throws SQLException {
         m.setId(rs.getInt("id"));
@@ -20,6 +20,6 @@ final class MemberMapper {
         m.setEmail(rs.getString("email"));
         m.setPhone(rs.getString("phone"));
         m.setAddress(rs.getString("address"));
-        m.setAccountStatus(rs.getString("accountStatus"));
+        m.setActive(rs.getBoolean("is_active"));
     }
 }

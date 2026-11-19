@@ -18,7 +18,7 @@
             member = new MemberDAO5().login(username, PasswordUtil.hash(password));
             if (member == null) {
                 error = "Tên tài khoản hoặc mật khẩu không đúng.";
-            } else if (!member.isAccountActive()) {
+            } else if (!member.isActive()) {
                 error = "Tài khoản đang bị khóa. Liên hệ thư viện để được hỗ trợ.";
             } else if (!(member instanceof Reader5 || member instanceof Librarian5)) {
                 error = "Phiên bản này chỉ hỗ trợ độc giả và nhân viên thư viện.";

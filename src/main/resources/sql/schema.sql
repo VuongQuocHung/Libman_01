@@ -2,6 +2,7 @@
 -- Quy ước: mỗi lệnh kết thúc bằng dấu; ở cuối dòng. Dòng bắt đầu bằng -- là chú thích.
 
 -- ---------- Nhóm con người (kế thừa dùng chung id) ----------
+-- is_active = FALSE nghĩa là tài khoản bị khóa, độc giả cũng không được mượn tài liệu
 CREATE TABLE tblMember5 (
   id INT AUTO_INCREMENT PRIMARY KEY,
   username VARCHAR(50) NOT NULL UNIQUE,
@@ -11,7 +12,7 @@ CREATE TABLE tblMember5 (
   email VARCHAR(100) NULL,
   phone VARCHAR(20) NULL,
   address VARCHAR(255) NULL,
-  accountStatus VARCHAR(30) NOT NULL DEFAULT 'Đang hoạt động'
+  is_active BOOLEAN NOT NULL DEFAULT TRUE
 );
 
 CREATE TABLE tblStaff5 (
@@ -72,6 +73,7 @@ CREATE TABLE tblDocument5 (
   description TEXT NULL,
   language VARCHAR(50) NULL,
   pageCount INT NULL,
+  documentStatus VARCHAR(30) NOT NULL DEFAULT 'Đang sử dụng'
 );
 
 CREATE TABLE tblPurchaseInvoice5 (

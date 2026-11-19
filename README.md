@@ -46,6 +46,10 @@ src/main/webapp/
 ## Khác biệt nhỏ so với báo cáo
 
 - Cột `condition` của `tblDocumentCopy5` đặt tên `copyCondition` (CONDITION là từ khóa MySQL).
+- `tblMember5` có thêm cột `is_active` (BOOLEAN). `FALSE` nghĩa là tài khoản bị khóa: không đăng nhập
+  được, và nếu là độc giả thì cũng không được mượn tài liệu. Cột này thay cho các cột trạng thái riêng.
+- Các cột `birthDate` (`tblMember5`), `language`, `pageCount`, `documentStatus` (`tblDocument5`) là phần
+  bổ sung ngoài báo cáo. `documentStatus` = "Ngừng sử dụng" thì tài liệu không hiện khi tìm kiếm.
 - Mã phiếu mượn sinh tự động dạng `PM` + số thứ tự 3 chữ số (PM001, PM002, ...).
 - Mật khẩu lưu dạng SHA-256 (đủ cho bài tập; hệ thống thật nên dùng bcrypt/argon2 có salt).
 - Hạn trả mặc định gợi ý 30 ngày (`LendingSession.DEFAULT_LOAN_DAYS`), nhân viên sửa được.

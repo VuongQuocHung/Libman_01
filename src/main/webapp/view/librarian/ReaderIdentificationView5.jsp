@@ -35,7 +35,7 @@
             if (reader == null) {
                 problems.add("Không tìm thấy thẻ hoặc độc giả có mã “" + code + "”.");
             } else {
-                if (!reader.isAccountActive() || !reader.isReaderActive())
+                if (!reader.isActive())
                     problems.add("Độc giả đang bị ngừng quyền mượn.");
                 if (card == null) {
                     problems.add("Độc giả chưa có thẻ nên chưa thể mượn tài liệu.");

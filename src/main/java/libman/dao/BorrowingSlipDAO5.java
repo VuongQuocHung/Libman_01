@@ -152,11 +152,11 @@ public class BorrowingSlipDAO5 {
 
     private static void checkReaderEligible(Connection c, int readerId, Date today) throws SQLException, BorrowException {
         try (PreparedStatement ps = c.prepareStatement(
-                "SELECT m.accountStatus, r.readerStatus FROM tblReader5 r JOIN tblMember5 m ON m.id = r.id WHERE r.id = ?")) {
+                "SELECT m.is_active FROM tblReader5 r JOIN tblMember5 m ON m.id = r.id WHERE r.id = ?")) {
             ps.setInt(1, readerId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (!rs.next()) throw new BorrowException("Không tìm thấy độc giả.");
-                if (!Status5.ACTIVE.equals(rs.getString("accountStatus")) || !Status5.ACTIVE.equals(rs.getString("readerStatus")))
+                if (!rs.getBoolean("is_active"))
                     throw new BorrowException("Độc giả đang bị ngừng quyền mượn.");
             }
         }
