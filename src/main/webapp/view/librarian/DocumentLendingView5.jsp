@@ -144,11 +144,6 @@
           <dt>Hết hạn thẻ</dt><dd><%= date(lendCard.getExpiryDate()) %></dd>
         <% } %>
       </dl>
-      <div class="actions" style="margin-top:16px">
-        <a class="btn btn-small" href="<%= ctx %>/view/librarian/ReaderIdentificationView5.jsp">
-          Đổi độc giả
-        </a>
-      </div>
     <% } %>
   </section>
 
