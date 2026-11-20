@@ -44,7 +44,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><%= esc(pageTitle) %> · LibMan</title>
-  <link rel="icon" href="data:,">
+  <link rel="icon" href="<%= ctx %>/assets/images/ptit-logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap&subset=vietnamese"
@@ -55,8 +55,11 @@
 <header class="topbar no-print">
   <div class="topbar-inner">
     <a class="brand" href="<%= hdrHome %>">
-      <span class="brand-name">LibMan</span>
-      <span class="brand-sub">Thư viện trường Đại học</span>
+      <img src="<%= ctx %>/assets/images/ptit-logo.png" alt="Logo PTIT">
+      <span class="brand-text">
+        <span class="brand-name">LibMan</span>
+        <span class="brand-sub">Thư viện Học viện Công nghệ Bưu chính Viễn thông</span>
+      </span>
     </a>
     <% if (hdrMember != null) { %>
     <div class="userchip">

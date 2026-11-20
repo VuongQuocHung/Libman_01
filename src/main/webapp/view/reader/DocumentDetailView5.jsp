@@ -97,23 +97,7 @@
       <div class="count"><small>Tổng số bản đang có</small><b><%= totalCount %></b></div>
       <div class="count"><small>Số bản có thể mượn</small><b><%= availableCount %></b></div>
 
-      <% if (totalCount > 0) { %>
-      <div>
-        <span class="meter" role="img"
-              aria-label="<%= availableCount %> trên <%= totalCount %> bản có thể mượn">
-          <%
-              for (int copyIndex = 0; copyIndex < totalCount; copyIndex++) {
-                  String boxClass = "off";
-                  if (copyIndex < availableCount) {
-                      boxClass = "";
-                  }
-          %>
-            <i class="<%= boxClass %>"></i>
-          <% } %>
-        </span>
-        <small style="margin-top:4px">Ô màu xanh là bản có thể mượn ngay</small>
-      </div>
-      <% } else { %>
+      <% if (totalCount == 0) { %>
       <div><small>Thư viện chưa nhập bản vật lí nào của tài liệu này.</small></div>
       <% } %>
     </div>

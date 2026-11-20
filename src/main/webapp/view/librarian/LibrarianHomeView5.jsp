@@ -17,9 +17,11 @@
     }
 %>
 <%@ include file="/WEB-INF/jspf/header.jspf" %>
-<div class="page-head">
-  <h1>Xin chào, <%= esc(librarian.getFullName()) %></h1>
-  <p class="lede">Làm thủ tục cho độc giả mượn tài liệu tại quầy.</p>
+<div class="hero">
+  <div class="hero-text">
+    <h1>Xin chào, <%= esc(librarian.getFullName()) %></h1>
+    <p class="lede">Làm thủ tục cho độc giả mượn tài liệu tại quầy.</p>
+  </div>
 </div>
 
 <% if (lendingReader != null) { %>

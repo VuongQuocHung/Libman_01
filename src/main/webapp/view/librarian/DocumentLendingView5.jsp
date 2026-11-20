@@ -134,7 +134,7 @@
   <li><span>3</span>Phiếu mượn</li>
 </ol>
 
-<div class="cols">
+<div class="cols" style="grid-template-columns:1fr">
   <section class="panel" aria-labelledby="h-reader">
     <div class="panel-head"><h2 id="h-reader">Độc giả</h2></div>
     <% if (!readerOk) { %>
@@ -246,17 +246,14 @@
     <form id="cancelForm" method="post" action="<%= selfUrl %>">
       <input type="hidden" name="action" value="cancel">
     </form>
-
-    <div class="actions" style="margin-top:20px">
-      <button class="btn btn-danger" type="submit" form="cancelForm"
-              onclick="return confirm('Hủy lượt cho mượn này? Danh sách đang chọn sẽ bị bỏ.');">
-        Hủy
-      </button>
-      <span class="spacer"></span>
-      <button class="btn btn-primary" type="submit" form="continueForm" <%= continueDisabled %>>
-        Tiếp tục
-      </button>
-    </div>
   </section>
+
+  <div class="actions">
+    <button class="btn" type="submit" form="cancelForm">Quay lại</button>
+    <span class="spacer"></span>
+    <button class="btn btn-primary" type="submit" form="continueForm" <%= continueDisabled %>>
+      Tiếp tục
+    </button>
+  </div>
 </div>
 <%@ include file="/WEB-INF/jspf/footer.jspf" %>

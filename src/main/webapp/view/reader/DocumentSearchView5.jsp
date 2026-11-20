@@ -123,18 +123,6 @@
           <td class="num"><%= yearText %></td>
           <td>
             <span class="avail">
-              <span class="meter" aria-hidden="true">
-                <%-- Mỗi ô là một bản; ô xanh là bản có thể mượn, ô xám là bản đang bận --%>
-                <%
-                    for (int copyIndex = 0; copyIndex < totalCount; copyIndex++) {
-                        String boxClass = "off";
-                        if (copyIndex < availableCount) {
-                            boxClass = "";
-                        }
-                %>
-                  <i class="<%= boxClass %>"></i>
-                <% } %>
-              </span>
               <span><b><%= availableCount %></b> / <%= totalCount %> bản</span>
             </span>
           </td>

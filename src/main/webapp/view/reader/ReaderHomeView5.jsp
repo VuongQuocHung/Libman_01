@@ -6,9 +6,11 @@
     Reader5 reader = (Reader5) session.getAttribute("member");
 %>
 <%@ include file="/WEB-INF/jspf/header.jspf" %>
-<div class="page-head">
-  <h1>Xin chào, <%= esc(reader.getFullName()) %></h1>
-  <p class="lede">Tra cứu tài liệu của thư viện trước khi đến quầy mượn.</p>
+<div class="hero">
+  <div class="hero-text">
+    <h1>Xin chào, <%= esc(reader.getFullName()) %></h1>
+    <p class="lede">Tra cứu tài liệu của thư viện trước khi đến quầy mượn.</p>
+  </div>
 </div>
 
 <div class="tiles">

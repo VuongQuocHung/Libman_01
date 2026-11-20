@@ -18,7 +18,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Đăng nhập · LibMan</title>
-  <link rel="icon" href="data:,">
+  <link rel="icon" href="<%= ctx %>/assets/images/ptit-logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap&subset=vietnamese" rel="stylesheet">
@@ -28,8 +28,11 @@
 <div class="login-page">
   <aside class="login-aside">
     <div>
-      <span class="brand-name" style="font-family:var(--serif);font-weight:600">LibMan</span>
-      <p style="margin-top:10px">Hệ thống quản lí thư viện trường Đại học: tra cứu tài liệu và làm thủ tục mượn tại quầy.</p>
+      <div class="login-logo">
+        <img src="<%= ctx %>/assets/images/ptit-logo.png" alt="Logo PTIT">
+        <span class="brand-name" style="font-family:var(--serif);font-weight:600">LibMan</span>
+      </div>
+      <p style="margin-top:14px">Thư viện Học viện Công nghệ Bưu chính Viễn thông: tra cứu tài liệu và làm thủ tục mượn tại quầy.</p>
     </div>
     <div class="demo">
       <b>Tài khoản dùng thử</b> (mật khẩu chung: 123456)
@@ -37,7 +40,7 @@
         <tr><td>hung</td><td>Độc giả, tìm tài liệu</td></tr>
         <tr><td>mai</td><td>Nhân viên thư viện, cho mượn</td></tr>
       </table>
-      <p style="margin:10px 0 0;font-size:.8rem">Thẻ để thử cho mượn: THE001 (hợp lệ), THE002 (hết hạn), THE003 (bị khóa), THE004 (hợp lệ).</p>
+      <p style="margin:10px 0 0;font-size:.8rem;color:#fde3e7">Thẻ để thử cho mượn: THE001 (hợp lệ), THE002 (hết hạn), THE003 (bị khóa), THE004 (hợp lệ).</p>
     </div>
   </aside>
   <section class="login-main">
