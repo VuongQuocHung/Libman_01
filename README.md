@@ -63,3 +63,5 @@ src/main/webapp/
 - Hạn trả mặc định gợi ý 30 ngày, nhân viên sửa được.
 - `DAO5` có thêm hàm `close()` để đóng kết nối sau khi dùng (JSP tạo DAO trong `try (...)`).
 - Giao diện dùng Google Fonts (Be Vietnam Pro, Newsreader); khi offline sẽ dùng font hệ thống.
+
+Copy-Item src\main\webapp\view\reader\DocumentSearchView5.jsp D:\apache-tomcat-9.0.115\webapps\libman-01\view\reader\

@@ -69,7 +69,6 @@
            placeholder="Ví dụ: Cơ sở dữ liệu" autofocus>
     <button class="btn btn-primary" type="submit">Tìm kiếm</button>
   </div>
-  <div class="hint">Nhập một phần tên cũng được. Không cần gõ dấu tiếng Việt.</div>
 </form>
 
 <% if (message != null) { %>

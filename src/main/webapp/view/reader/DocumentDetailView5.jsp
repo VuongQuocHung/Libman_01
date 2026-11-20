@@ -96,10 +96,6 @@
     <div class="holdings">
       <div class="count"><small>Tổng số bản đang có</small><b><%= totalCount %></b></div>
       <div class="count"><small>Số bản có thể mượn</small><b><%= availableCount %></b></div>
-
-      <% if (totalCount == 0) { %>
-      <div><small>Thư viện chưa nhập bản vật lí nào của tài liệu này.</small></div>
-      <% } %>
     </div>
   </article>
 <% } %>

@@ -34,14 +34,6 @@
       </div>
       <p style="margin-top:14px">Thư viện Học viện Công nghệ Bưu chính Viễn thông: tra cứu tài liệu và làm thủ tục mượn tại quầy.</p>
     </div>
-    <div class="demo">
-      <b>Tài khoản dùng thử</b> (mật khẩu chung: 123456)
-      <table>
-        <tr><td>hung</td><td>Độc giả, tìm tài liệu</td></tr>
-        <tr><td>mai</td><td>Nhân viên thư viện, cho mượn</td></tr>
-      </table>
-      <p style="margin:10px 0 0;font-size:.8rem;color:#fde3e7">Thẻ để thử cho mượn: THE001 (hợp lệ), THE002 (hết hạn), THE003 (bị khóa), THE004 (hợp lệ).</p>
-    </div>
   </aside>
   <section class="login-main">
     <form class="login-box" method="post" action="<%= ctx %>/doLogin.jsp" autocomplete="on">

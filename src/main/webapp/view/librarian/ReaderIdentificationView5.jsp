@@ -106,6 +106,25 @@
             cardBadgeText = card.getCardStatus();
         }
     }
+
+    // Ảnh trên thẻ độc giả: cột photo lưu đường dẫn ảnh (tính từ gốc web app) hoặc URL đầy đủ.
+    // Thẻ chưa có ảnh thì vẽ avatar bằng chữ cái đầu của tên gọi.
+    String photoUrl = null;
+    String readerInitial = "";
+    if (card != null && reader != null) {
+        String photo = card.getPhoto();
+        if (photo != null && !photo.isBlank()) {
+            if (photo.startsWith("http://") || photo.startsWith("https://")) {
+                photoUrl = photo;
+            } else {
+                photoUrl = base + "/" + photo.replaceFirst("^/+", "");
+            }
+        }
+        if (reader.getFullName() != null && !reader.getFullName().isBlank()) {
+            String[] nameWords = reader.getFullName().trim().split("\\s+");
+            readerInitial = nameWords[nameWords.length - 1].substring(0, 1).toUpperCase();
+        }
+    }
 %>
 <%@ include file="/WEB-INF/jspf/header.jspf" %>
 <div class="page-head">
@@ -134,7 +153,6 @@
            placeholder="Quét thẻ độc giả hoặc nhập mã thẻ, ví dụ THE001">
     <button class="btn btn-primary" type="submit">Tìm kiếm</button>
   </div>
-  <div class="hint">Đầu đọc mã vạch sẽ tự điền mã vào ô này rồi tìm.</div>
 </form>
 
 <% if (searched && !problems.isEmpty()) { %>
@@ -152,6 +170,12 @@
 <div class="cols" style="margin-top:18px;grid-template-columns:1fr 1fr">
   <section class="panel">
     <div class="panel-head"><h2>Thông tin độc giả</h2></div>
+    <div class="reader-id">
+      <% if (photoUrl != null) { %>
+        <img class="reader-photo" src="<%= esc(photoUrl) %>" alt="Ảnh độc giả <%= esc(reader.getFullName()) %>">
+      <% } else { %>
+        <span class="reader-photo reader-photo-empty" aria-hidden="true"><%= esc(readerInitial) %></span>
+      <% } %>
     <dl class="kv">
       <dt>Mã độc giả</dt><dd><%= esc(reader.getReaderCode()) %></dd>
       <dt>Họ và tên</dt><dd><%= esc(reader.getFullName()) %></dd>
@@ -160,6 +184,7 @@
       <dt>Số điện thoại</dt><dd><%= esc(reader.getPhone()) %></dd>
       <dt>Địa chỉ</dt><dd><%= esc(reader.getAddress()) %></dd>
     </dl>
+    </div>
   </section>
 
   <section class="panel">

@@ -168,7 +168,6 @@
            placeholder="Quét mã trên bản tài liệu hoặc nhập mã, ví dụ BTL001">
     <button class="btn btn-primary" type="submit">Tìm kiếm</button>
   </div>
-  <div class="hint">Mỗi lần chỉ thêm một bản. Sau khi thêm, quay về danh sách và quét bản tiếp theo.</div>
 </form>
 
 <% if (searched && !problems.isEmpty()) { %>
@@ -220,8 +219,5 @@
     <a class="btn" href="<%= lendingUrl %>">Quay lại</a>
     <button class="btn btn-primary" type="submit" <%= addDisabled %>>Thêm vào danh sách</button>
   </div>
-  <% if (!canAdd && !searched) { %>
-    <div class="hint" style="margin-top:10px">Nút thêm sẽ sáng lên khi bản tài liệu hợp lệ.</div>
-  <% } %>
 </form>
 <%@ include file="/WEB-INF/jspf/footer.jspf" %>

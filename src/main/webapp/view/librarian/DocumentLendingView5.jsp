@@ -107,13 +107,6 @@
         stepTwoClass = "now";
     }
 
-    String emptyListHint;
-    if (readerOk) {
-        emptyListHint = "Chọn “Quét mã bản tài liệu” rồi quét hoặc nhập mã trên từng bản.";
-    } else {
-        emptyListHint = "Xác định độc giả trước, sau đó thêm các bản tài liệu họ muốn mượn.";
-    }
-
     // Nút Tiếp tục chỉ bấm được khi đã có độc giả và ít nhất một bản
     String continueDisabled = "";
     if (!readerOk || !hasItems) {
@@ -174,7 +167,6 @@
     <% if (!hasItems) { %>
       <div class="empty">
         <strong>Chưa có tài liệu nào</strong>
-        <%= emptyListHint %>
       </div>
     <% } else { %>
       <div class="table-wrap">
@@ -237,10 +229,6 @@
         <label class="lbl" for="dueDate">Hạn trả chung</label>
         <input class="input" id="dueDate" name="dueDate" type="date"
                value="<%= dueDate %>" min="<%= earliestDueDate %>" required>
-      </div>
-      <div class="hint" style="flex-basis:100%;margin:0">
-        Mặc định 30 ngày kể từ hôm nay.
-        Mọi bản trong phiếu dùng chung một hạn trả.
       </div>
     </form>
     <form id="cancelForm" method="post" action="<%= selfUrl %>">
