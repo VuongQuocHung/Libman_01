@@ -19,7 +19,7 @@ public class DocumentDAO5 extends DAO5 {
      */
     public List<Document5> getDocumentByTitle(String keyword) throws SQLException {
         String sql = "SELECT * FROM tblDocument5 "
-                + "WHERE documentStatus = 'Đang sử dụng' AND title LIKE ? "
+                + "WHERE status = 'Đang sử dụng' AND title LIKE ? "
                 + "ORDER BY title, documentCode";
 
         List<Document5> documents = new ArrayList<>();
@@ -37,9 +37,7 @@ public class DocumentDAO5 extends DAO5 {
                     document.setPublisher(rs.getString("publisher"));
                     document.setYear(rs.getObject("year", Integer.class));
                     document.setDescription(rs.getString("description"));
-                    document.setLanguage(rs.getString("language"));
-                    document.setPageCount(rs.getObject("pageCount", Integer.class));
-                    document.setDocumentStatus(rs.getString("documentStatus"));
+                    document.setDocumentStatus(rs.getString("status"));
                     documents.add(document);
                 }
             }
@@ -68,9 +66,7 @@ public class DocumentDAO5 extends DAO5 {
                 document.setPublisher(rs.getString("publisher"));
                 document.setYear(rs.getObject("year", Integer.class));
                 document.setDescription(rs.getString("description"));
-                document.setLanguage(rs.getString("language"));
-                document.setPageCount(rs.getObject("pageCount", Integer.class));
-                document.setDocumentStatus(rs.getString("documentStatus"));
+                document.setDocumentStatus(rs.getString("status"));
                 return document;
             }
         }

@@ -10,8 +10,6 @@ public class Document5 {
     private String publisher;
     private Integer year;
     private String description;
-    private String language;
-    private Integer pageCount;
     private String documentStatus;
 
     public Integer getId() {
@@ -76,22 +74,6 @@ public class Document5 {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public String getLanguage() {
-        return language;
-    }
-
-    public void setLanguage(String language) {
-        this.language = language;
-    }
-
-    public Integer getPageCount() {
-        return pageCount;
-    }
-
-    public void setPageCount(Integer pageCount) {
-        this.pageCount = pageCount;
     }
 
     public String getDocumentStatus() {

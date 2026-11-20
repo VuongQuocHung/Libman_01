@@ -2,13 +2,13 @@ package libman.model;
 
 /** Nhân viên quản lí. */
 public class Manager5 extends Staff5 {
-    private String level;
+    private String managerLevel;
 
-    public String getLevel() {
-        return level;
+    public String getManagerLevel() {
+        return managerLevel;
     }
 
-    public void setLevel(String level) {
-        this.level = level;
+    public void setManagerLevel(String managerLevel) {
+        this.managerLevel = managerLevel;
     }
 }

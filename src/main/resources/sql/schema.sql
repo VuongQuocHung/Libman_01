@@ -1,182 +1,191 @@
--- LibMan - schema MySQL 8 (17 bảng, theo mục 3.2 báo cáo)
+-- LibMan - schema MySQL 8 (17 bảng, theo sơ đồ thiết kế CSDL mục 3.2 báo cáo)
 -- Chạy: mysql -u root -p < schema.sql   (sau đó chạy data.sql để nạp dữ liệu mẫu)
 
--- Collation utf8mb4_0900_ai_ci: tìm kiếm không phân biệt hoa/thường và dấu tiếng Việt
-CREATE DATABASE IF NOT EXISTS libman CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
-USE libman;
+-- Collation mặc định của MySQL 8 (utf8mb4_0900_ai_ci): tìm kiếm không phân biệt hoa/thường và dấu tiếng Việt
+create database if not exists libman;
+use libman;
 
--- ---------- Nhóm con người (kế thừa dùng chung id) ----------
--- is_active = FALSE nghĩa là tài khoản bị khóa, độc giả cũng không được mượn tài liệu
-CREATE TABLE tblMember5 (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  username VARCHAR(50) NOT NULL UNIQUE,
-  password VARCHAR(100) NOT NULL,
-  fullName VARCHAR(100) NOT NULL,
-  birthDate DATE NULL,
-  email VARCHAR(100) NULL,
-  phone VARCHAR(20) NULL,
-  address VARCHAR(255) NULL,
-  is_active BOOLEAN NOT NULL DEFAULT TRUE
+-- Nhóm thành viên: bảng con dùng chung id với bảng cha (khóa chính đồng thời là khóa ngoại)
+
+-- type: vai trò của thành viên ('Độc giả', 'Nhân viên thư viện', 'Nhân viên quản lí')
+-- isActive = 0 nghĩa là tài khoản bị khóa, độc giả cũng không được mượn tài liệu
+create table tblMember5 (
+  id int auto_increment primary key,
+  username varchar(255) not null unique,
+  password varchar(255) not null,
+  fullName varchar(255) not null,
+  email varchar(255) not null unique,
+  phone varchar(255) not null,
+  address varchar(255) not null,
+  type varchar(255) not null,
+  isActive tinyint(1) not null default 1,
+  birthDate date null,
+  note varchar(255) null
 );
 
-CREATE TABLE tblStaff5 (
-  id INT PRIMARY KEY,
-  staffCode VARCHAR(20) NOT NULL UNIQUE,
-  position VARCHAR(100) NULL,
-  startDate DATE NULL,
-  CONSTRAINT fk_staff_member FOREIGN KEY (id) REFERENCES tblMember5(id)
+create table tblStaff5 (
+  tblMember5id int primary key,
+  staffCode varchar(255) not null unique,
+  position varchar(255) not null,
+  startDate date not null,
+  foreign key (tblMember5id) references tblMember5(id)
 );
 
-CREATE TABLE tblReader5 (
-  id INT PRIMARY KEY,
-  readerCode VARCHAR(20) NOT NULL UNIQUE,
-  CONSTRAINT fk_reader_member FOREIGN KEY (id) REFERENCES tblMember5(id)
+create table tblManager5 (
+  tblStaff5Member5id int primary key,
+  managerLevel varchar(255) not null,
+  foreign key (tblStaff5Member5id) references tblStaff5(tblMember5id)
 );
 
-CREATE TABLE tblManager5 (
-  id INT PRIMARY KEY,
-  `level` VARCHAR(50) NULL,
-  CONSTRAINT fk_manager_staff FOREIGN KEY (id) REFERENCES tblStaff5(id)
+create table tblLibrarian5 (
+  tblStaff5Member5id int primary key,
+  schedule varchar(255) null,
+  foreign key (tblStaff5Member5id) references tblStaff5(tblMember5id)
 );
 
-CREATE TABLE tblLibrarian5 (
-  id INT PRIMARY KEY,
-  schedule VARCHAR(100) NULL,
-  CONSTRAINT fk_librarian_staff FOREIGN KEY (id) REFERENCES tblStaff5(id)
+create table tblReader5 (
+  tblMember5id int primary key,
+  readerCode varchar(255) not null unique,
+  foreign key (tblMember5id) references tblMember5(id)
 );
 
-CREATE TABLE tblReaderCard5 (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  cardCode VARCHAR(20) NOT NULL UNIQUE,
-  registrationDate DATE NOT NULL,
-  expiryDate DATE NOT NULL,
-  cardStatus VARCHAR(30) NOT NULL DEFAULT 'Đang hoạt động',
-  photo VARCHAR(255) NULL,
-  readerId INT NOT NULL,
-  CONSTRAINT fk_card_reader FOREIGN KEY (readerId) REFERENCES tblReader5(id)
+create table tblReaderCard5 (
+  id int auto_increment primary key,
+  cardCode varchar(255) not null unique,
+  registrationDate date not null,
+  expiryDate date not null,
+  cardStatus varchar(255) not null,
+  photo varchar(255) null,
+  tblReader5tblMember5id int not null,
+  foreign key (tblReader5tblMember5id) references tblReader5(tblMember5id)
 );
 
-CREATE TABLE tblSupplier5 (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  supplierCode VARCHAR(20) NOT NULL UNIQUE,
-  name VARCHAR(150) NOT NULL,
-  email VARCHAR(100) NULL,
-  phone VARCHAR(20) NULL,
-  address VARCHAR(255) NULL
+-- Nhóm tài liệu và nhập tài liệu
+
+create table tblSupplier5 (
+  id int auto_increment primary key,
+  supplierCode varchar(255) not null unique,
+  name varchar(255) not null,
+  email varchar(255) not null unique,
+  phone varchar(255) not null,
+  address varchar(255) not null,
+  note varchar(255) null
 );
 
--- ---------- Nhóm tài liệu ----------
-CREATE TABLE tblDocument5 (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  documentCode VARCHAR(20) NOT NULL UNIQUE,
-  title VARCHAR(255) NOT NULL,
-  documentType VARCHAR(50) NOT NULL,
-  author VARCHAR(150) NULL,
-  publisher VARCHAR(150) NULL,
-  `year` INT NULL,
-  description TEXT NULL,
-  language VARCHAR(50) NULL,
-  pageCount INT NULL,
-  documentStatus VARCHAR(30) NOT NULL DEFAULT 'Đang sử dụng'
+-- status: trạng thái quản lí ('Đang sử dụng', 'Ngừng sử dụng')
+create table tblDocument5 (
+  id int auto_increment primary key,
+  documentCode varchar(255) not null unique,
+  title varchar(255) not null,
+  documentType varchar(255) not null,
+  author varchar(255) not null,
+  publisher varchar(255) not null,
+  `year` int not null,
+  description varchar(255) not null,
+  status varchar(255) null
 );
 
-CREATE TABLE tblPurchaseInvoice5 (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  invoiceCode VARCHAR(20) NOT NULL UNIQUE,
-  importDate DATE NOT NULL,
-  supplierId INT NOT NULL,
-  librarianId INT NOT NULL,
-  CONSTRAINT fk_invoice_supplier FOREIGN KEY (supplierId) REFERENCES tblSupplier5(id),
-  CONSTRAINT fk_invoice_librarian FOREIGN KEY (librarianId) REFERENCES tblLibrarian5(id)
+-- copyCondition = "condition" trong báo cáo (condition là từ khóa của MySQL)
+create table tblDocumentCopy5 (
+  id int auto_increment primary key,
+  copyCode varchar(255) not null unique,
+  location varchar(255) not null,
+  copyCondition varchar(255) not null,
+  usageStatus varchar(255) not null,
+  tblDocument5id int not null,
+  foreign key (tblDocument5id) references tblDocument5(id)
 );
 
-CREATE TABLE tblImportDetail5 (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  quantity INT NOT NULL,
-  price INT NOT NULL DEFAULT 0,
-  purchaseInvoiceId INT NOT NULL,
-  documentId INT NOT NULL,
-  CONSTRAINT uq_import_invoice_doc UNIQUE (purchaseInvoiceId, documentId),
-  CONSTRAINT fk_import_invoice FOREIGN KEY (purchaseInvoiceId) REFERENCES tblPurchaseInvoice5(id),
-  CONSTRAINT fk_import_document FOREIGN KEY (documentId) REFERENCES tblDocument5(id)
+create table tblPurchaseInvoice5 (
+  id int auto_increment primary key,
+  invoiceCode varchar(255) null unique,
+  importDate date not null,
+  tblSupplier5id int not null,
+  tblLibrarian5tblStaff5Member5id int not null,
+  foreign key (tblSupplier5id) references tblSupplier5(id),
+  foreign key (tblLibrarian5tblStaff5Member5id) references tblLibrarian5(tblStaff5Member5id)
 );
 
--- copyCondition = "condition" trong báo cáo (CONDITION là từ khóa của MySQL)
-CREATE TABLE tblDocumentCopy5 (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  copyCode VARCHAR(20) NOT NULL UNIQUE,
-  location VARCHAR(100) NULL,
-  copyCondition VARCHAR(30) NOT NULL DEFAULT 'Tốt',
-  usageStatus VARCHAR(30) NOT NULL DEFAULT 'Sẵn có',
-  documentId INT NOT NULL,
-  importDetailId INT NULL,
-  CONSTRAINT fk_copy_document FOREIGN KEY (documentId) REFERENCES tblDocument5(id),
-  CONSTRAINT fk_copy_import FOREIGN KEY (importDetailId) REFERENCES tblImportDetail5(id)
+create table tblImportDetail5 (
+  id int auto_increment primary key,
+  quantity int not null,
+  price int not null,
+  tblPurchaseInvoice5id int not null,
+  tblDocument5id int not null,
+  foreign key (tblPurchaseInvoice5id) references tblPurchaseInvoice5(id),
+  foreign key (tblDocument5id) references tblDocument5(id)
 );
 
--- ---------- Nhóm mượn / trả / phạt ----------
-CREATE TABLE tblBorrowingSlip5 (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  borrowCode VARCHAR(20) NULL UNIQUE,
-  borrowDate DATE NOT NULL,
-  dueDate DATE NOT NULL,
-  readerId INT NOT NULL,
-  librarianId INT NOT NULL,
-  CONSTRAINT fk_bslip_reader FOREIGN KEY (readerId) REFERENCES tblReader5(id),
-  CONSTRAINT fk_bslip_librarian FOREIGN KEY (librarianId) REFERENCES tblLibrarian5(id)
+-- Nhóm mượn, trả, phạt
+
+-- borrowCode để trống lúc insert, sinh từ id ngay sau đó (PM001, PM002...)
+create table tblBorrowingSlip5 (
+  id int auto_increment primary key,
+  borrowCode varchar(255) null unique,
+  borrowDate date not null,
+  dueDate date not null,
+  tblReader5tblMember5id int not null,
+  tblLibrarian5tblStaff5Member5id int not null,
+  foreign key (tblReader5tblMember5id) references tblReader5(tblMember5id),
+  foreign key (tblLibrarian5tblStaff5Member5id) references tblLibrarian5(tblStaff5Member5id)
 );
 
-CREATE TABLE tblBorrowingDetail5 (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  conditionOnBorrowing VARCHAR(30) NOT NULL,
-  borrowingSlipId INT NOT NULL,
-  documentCopyId INT NOT NULL,
-  CONSTRAINT uq_bdetail_slip_copy UNIQUE (borrowingSlipId, documentCopyId),
-  CONSTRAINT fk_bdetail_slip FOREIGN KEY (borrowingSlipId) REFERENCES tblBorrowingSlip5(id),
-  CONSTRAINT fk_bdetail_copy FOREIGN KEY (documentCopyId) REFERENCES tblDocumentCopy5(id)
+-- Một bản chỉ xuất hiện một lần trong một phiếu mượn
+create table tblBorrowingDetail5 (
+  id int auto_increment primary key,
+  conditionOnBorrowing varchar(255) not null,
+  tblBorrowingSlip5id int not null,
+  tblDocumentCopy5id int not null,
+  unique (tblBorrowingSlip5id, tblDocumentCopy5id),
+  foreign key (tblBorrowingSlip5id) references tblBorrowingSlip5(id),
+  foreign key (tblDocumentCopy5id) references tblDocumentCopy5(id)
 );
 
-CREATE TABLE tblReturnSlip5 (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  returnCode VARCHAR(20) NOT NULL UNIQUE,
-  returnDate DATE NOT NULL,
-  readerId INT NOT NULL,
-  librarianId INT NOT NULL,
-  CONSTRAINT fk_rslip_reader FOREIGN KEY (readerId) REFERENCES tblReader5(id),
-  CONSTRAINT fk_rslip_librarian FOREIGN KEY (librarianId) REFERENCES tblLibrarian5(id)
+create table tblReturnSlip5 (
+  id int auto_increment primary key,
+  returnCode varchar(255) null unique,
+  returnDate date not null,
+  note varchar(255) null,
+  tblReader5tblMember5id int not null,
+  tblLibrarian5tblStaff5Member5id int not null,
+  foreign key (tblReader5tblMember5id) references tblReader5(tblMember5id),
+  foreign key (tblLibrarian5tblStaff5Member5id) references tblLibrarian5(tblStaff5Member5id)
 );
 
-CREATE TABLE tblReturnDetail5 (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  conditionOnReturn VARCHAR(30) NOT NULL,
-  note VARCHAR(255) NULL,
-  returnSlipId INT NOT NULL,
-  borrowingDetailId INT NOT NULL UNIQUE,
-  CONSTRAINT fk_rdetail_slip FOREIGN KEY (returnSlipId) REFERENCES tblReturnSlip5(id),
-  CONSTRAINT fk_rdetail_bdetail FOREIGN KEY (borrowingDetailId) REFERENCES tblBorrowingDetail5(id)
+-- Mỗi chi tiết mượn được trả nhiều nhất một lần (quan hệ 1 - 0..1)
+create table tblReturnDetail5 (
+  id int auto_increment primary key,
+  conditionOnReturn varchar(255) not null,
+  note varchar(255) null,
+  tblReturnSlip5id int not null,
+  tblBorrowingDetail5id int not null unique,
+  foreign key (tblReturnSlip5id) references tblReturnSlip5(id),
+  foreign key (tblBorrowingDetail5id) references tblBorrowingDetail5(id)
 );
 
 -- totalAmount là thuộc tính dẫn xuất => không lưu (tổng amount của tblFineDetail5)
-CREATE TABLE tblFineSlip5 (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  fineCode VARCHAR(20) NOT NULL UNIQUE,
-  createdDate DATE NOT NULL,
-  paymentStatus VARCHAR(30) NOT NULL DEFAULT 'Chưa thanh toán',
-  paidDate DATE NULL,
-  note VARCHAR(255) NULL,
-  readerId INT NOT NULL,
-  librarianId INT NOT NULL,
-  CONSTRAINT fk_fslip_reader FOREIGN KEY (readerId) REFERENCES tblReader5(id),
-  CONSTRAINT fk_fslip_librarian FOREIGN KEY (librarianId) REFERENCES tblLibrarian5(id)
+create table tblFineSlip5 (
+  id int auto_increment primary key,
+  fineCode varchar(255) not null unique,
+  createdDate date not null,
+  paymentStatus varchar(255) not null,
+  paidDate date null,
+  note varchar(255) null,
+  tblReader5tblMember5id int not null,
+  tblLibrarian5tblStaff5Member5id int not null,
+  foreign key (tblReader5tblMember5id) references tblReader5(tblMember5id),
+  foreign key (tblLibrarian5tblStaff5Member5id) references tblLibrarian5(tblStaff5Member5id)
 );
 
-CREATE TABLE tblFineDetail5 (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  daysLate INT NOT NULL DEFAULT 0,
-  amount INT NOT NULL DEFAULT 0,
-  description VARCHAR(255) NULL,
-  fineSlipId INT NOT NULL,
-  borrowingDetailId INT NOT NULL UNIQUE,
-  CONSTRAINT fk_fdetail_slip FOREIGN KEY (fineSlipId) REFERENCES tblFineSlip5(id),
-  CONSTRAINT fk_fdetail_bdetail FOREIGN KEY (borrowingDetailId) REFERENCES tblBorrowingDetail5(id)
+-- Mỗi chi tiết mượn bị phạt nhiều nhất một lần (quan hệ 1 - 0..1)
+create table tblFineDetail5 (
+  id int auto_increment primary key,
+  amount int not null,
+  daysLate int not null,
+  description varchar(255) null,
+  note varchar(255) null,
+  tblFineSlip5id int not null,
+  tblBorrowingDetail5id int not null unique,
+  foreign key (tblFineSlip5id) references tblFineSlip5(id),
+  foreign key (tblBorrowingDetail5id) references tblBorrowingDetail5(id)
 );

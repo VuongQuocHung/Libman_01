@@ -23,7 +23,7 @@ public class DocumentCopyDAO5 extends DAO5 {
                 + "COUNT(CASE WHEN usageStatus <> 'Thanh lí' THEN 1 END) AS total, "
                 + "COUNT(CASE WHEN usageStatus = 'Sẵn có' AND copyCondition <> 'Hư hỏng' THEN 1 END) AS available "
                 + "FROM tblDocumentCopy5 "
-                + "WHERE documentId = ?";
+                + "WHERE tblDocument5id = ?";
 
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, documentId);
@@ -44,7 +44,7 @@ public class DocumentCopyDAO5 extends DAO5 {
     public DocumentCopy5 getCopyByCode(String copyCode) throws SQLException {
         String sql = "SELECT cp.id AS copyId, cp.copyCode, cp.location, cp.copyCondition, cp.usageStatus, d.* "
                 + "FROM tblDocumentCopy5 cp "
-                + "JOIN tblDocument5 d ON d.id = cp.documentId "
+                + "JOIN tblDocument5 d ON d.id = cp.tblDocument5id "
                 + "WHERE cp.copyCode = ?";
 
         try (PreparedStatement ps = con.prepareStatement(sql)) {
@@ -73,9 +73,7 @@ public class DocumentCopyDAO5 extends DAO5 {
                 document.setPublisher(rs.getString("publisher"));
                 document.setYear(rs.getObject("year", Integer.class));
                 document.setDescription(rs.getString("description"));
-                document.setLanguage(rs.getString("language"));
-                document.setPageCount(rs.getObject("pageCount", Integer.class));
-                document.setDocumentStatus(rs.getString("documentStatus"));
+                document.setDocumentStatus(rs.getString("status"));
 
                 copy.setDocument(document);
                 return copy;

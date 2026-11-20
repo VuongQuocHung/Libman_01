@@ -131,14 +131,8 @@
 
     // chuẩn bị dữ liệu hiển thị
     String usageBadgeClass = "badge-warn";
-    String pageCountText = "";
-    if (copy != null && document != null) {
-        if ("Sẵn có".equals(copy.getUsageStatus())) {
-            usageBadgeClass = "badge-ok";
-        }
-        if (document.getPageCount() != null) {
-            pageCountText = String.valueOf(document.getPageCount());
-        }
+    if (copy != null && "Sẵn có".equals(copy.getUsageStatus())) {
+        usageBadgeClass = "badge-ok";
     }
 
     // Ô chọn tình trạng và nút Thêm chỉ dùng được khi bản hợp lệ
@@ -192,8 +186,8 @@
     <dt>Mã đầu tài liệu</dt><dd><%= esc(document.getDocumentCode()) %></dd>
     <dt>Tên tài liệu</dt><dd><%= esc(document.getTitle()) %></dd>
     <dt>Loại tài liệu</dt><dd><%= esc(document.getDocumentType()) %></dd>
-    <dt>Ngôn ngữ</dt><dd><%= esc(document.getLanguage()) %></dd>
-    <dt>Số trang</dt><dd><%= pageCountText %></dd>
+    <dt>Tác giả</dt><dd><%= esc(document.getAuthor()) %></dd>
+    <dt>Nhà xuất bản</dt><dd><%= esc(document.getPublisher()) %></dd>
     <dt>Vị trí lưu trữ</dt><dd><%= esc(copy.getLocation()) %></dd>
     <dt>Tình trạng ghi nhận</dt><dd><%= esc(copy.getCopyCondition()) %></dd>
   </dl>

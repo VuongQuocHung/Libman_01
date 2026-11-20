@@ -12,7 +12,9 @@ public class Member5 {
     private String email;
     private String phone;
     private String address;
+    private String type;
     private boolean active;
+    private String note;
 
     public Integer getId() {
         return id;
@@ -78,6 +80,15 @@ public class Member5 {
         this.address = address;
     }
 
+    /** Vai trò: "Độc giả", "Nhân viên thư viện" hoặc "Nhân viên quản lí". */
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
     /** false = tài khoản bị khóa; với độc giả còn nghĩa là ngừng quyền mượn. */
     public boolean isActive() {
         return active;
@@ -85,5 +96,13 @@ public class Member5 {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
     }
 }

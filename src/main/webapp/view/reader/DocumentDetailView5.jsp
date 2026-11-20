@@ -87,12 +87,6 @@
       <div><dt>Tác giả</dt><dd><%= esc(document.getAuthor()) %></dd></div>
       <div><dt>Năm xuất bản</dt><dd><%= yearText %></dd></div>
       <div><dt>Nhà xuất bản</dt><dd><%= esc(document.getPublisher()) %></dd></div>
-      <% if (document.getLanguage() != null) { %>
-        <div><dt>Ngôn ngữ</dt><dd><%= esc(document.getLanguage()) %></dd></div>
-      <% } %>
-      <% if (document.getPageCount() != null) { %>
-        <div><dt>Số trang</dt><dd><%= document.getPageCount() %></dd></div>
-      <% } %>
     </dl>
 
     <% if (document.getDescription() != null && !document.getDescription().isBlank()) { %>

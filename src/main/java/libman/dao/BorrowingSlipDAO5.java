@@ -22,10 +22,12 @@ public class BorrowingSlipDAO5 extends DAO5 {
      * @throws Exception nếu có bản không còn "Sẵn có" (ví dụ vừa được người khác mượn)
      */
     public BorrowingSlip5 saveBorrowingSlip(BorrowingSlip5 slip) throws Exception {
-        String slipSql = "INSERT INTO tblBorrowingSlip5 (borrowDate, dueDate, readerId, librarianId) "
+        String slipSql = "INSERT INTO tblBorrowingSlip5 "
+                + "(borrowDate, dueDate, tblReader5tblMember5id, tblLibrarian5tblStaff5Member5id) "
                 + "VALUES (?, ?, ?, ?)";
         String codeSql = "UPDATE tblBorrowingSlip5 SET borrowCode = ? WHERE id = ?";
-        String detailSql = "INSERT INTO tblBorrowingDetail5 (conditionOnBorrowing, borrowingSlipId, documentCopyId) "
+        String detailSql = "INSERT INTO tblBorrowingDetail5 "
+                + "(conditionOnBorrowing, tblBorrowingSlip5id, tblDocumentCopy5id) "
                 + "VALUES (?, ?, ?)";
         String copySql = "UPDATE tblDocumentCopy5 SET usageStatus = 'Đang được mượn' "
                 + "WHERE id = ? AND usageStatus = 'Sẵn có'";

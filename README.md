@@ -48,11 +48,15 @@ src/main/webapp/
 
 ## Khác biệt nhỏ so với báo cáo
 
+- CSDL theo sơ đồ thiết kế CSDL (mục 3.2): bảng con dùng chung id với bảng cha, khóa ngoại đặt tên
+  theo bảng được tham chiếu (`tblReader5tblMember5id`, `tblLibrarian5tblStaff5Member5id`, ...).
+  Ngoài sơ đồ vẫn giữ các mã nghiệp vụ `documentCode`, `copyCode`, `borrowCode`, `returnCode` và cột
+  `title`, `author` của `tblDocument5` (có trong bước 2 của mục 3.2).
 - Cột `condition` của `tblDocumentCopy5` đặt tên `copyCondition` (CONDITION là từ khóa MySQL).
-- `tblMember5` có thêm cột `is_active` (BOOLEAN). `FALSE` nghĩa là tài khoản bị khóa: không đăng nhập
-  được, và nếu là độc giả thì cũng không được mượn tài liệu. Cột này thay cho các cột trạng thái riêng.
-- Các cột `birthDate` (`tblMember5`), `language`, `pageCount`, `documentStatus` (`tblDocument5`) là phần
-  bổ sung ngoài báo cáo. `documentStatus` = "Ngừng sử dụng" thì tài liệu không hiện khi tìm kiếm.
+- `tblMember5.type` là vai trò ("Độc giả", "Nhân viên thư viện", "Nhân viên quản lí"), đăng nhập dựa vào
+  cột này. `isActive` = 0 nghĩa là tài khoản bị khóa: không đăng nhập được, và nếu là độc giả thì cũng
+  không được mượn tài liệu.
+- `tblDocument5.status` = "Ngừng sử dụng" thì tài liệu không hiện khi tìm kiếm.
 - Mã phiếu mượn sinh tự động dạng `PM` + số thứ tự 3 chữ số (PM001, PM002, ...).
 - Mật khẩu lưu dạng SHA-256, câu truy vấn đăng nhập so sánh bằng `SHA2(?, 256)`
   (đủ cho bài tập; hệ thống thật nên dùng bcrypt/argon2 có salt).
